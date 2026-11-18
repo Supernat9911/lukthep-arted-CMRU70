@@ -1,0 +1,154 @@
+<title>คู่มือ ลูกเทพศิลปศึกษา</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
+<style>
+/* Layout: one reading column; tabs switch between the student and teacher guides. */
+:root{
+ --bg:#f5f4fa;--panel:#ffffff;--line:#e2dfee;--ink:#1c1a2e;--muted:#5f5c78;
+ --accent:#6a55d6;--accent-ink:#ffffff;--soft:#ece8ff;--soft-ink:#43319f;--warn:#8f520c;--warn-bg:#fcecd5;
+ --ok:#137353;--ok-bg:#dcf4e9;--crit:#a8244b;--crit-bg:#fbe3ea;--done:#4b39b0;--done-bg:#ebe6ff;--chip:#f3f1fa;
+ --font:'IBM Plex Sans Thai',system-ui,-apple-system,'Segoe UI',sans-serif;
+ --display:'Anuphan','IBM Plex Sans Thai',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --bg:#10111a;--panel:#191a27;--line:#2d2e40;--ink:#f6f4ff;--muted:#a3a6bd;
+ --accent:#b4a5ff;--accent-ink:#181328;--soft:#252139;--soft-ink:#ddd4ff;--warn:#ffcf97;--warn-bg:#413427;
+ --ok:#a6eed1;--ok-bg:#233b37;--crit:#ffc1d3;--crit-bg:#402b39;--done:#d5c9ff;--done-bg:#30294a;--chip:#222333;color-scheme:dark}}
+:root[data-theme="dark"]{
+ --bg:#10111a;--panel:#191a27;--line:#2d2e40;--ink:#f6f4ff;--muted:#a3a6bd;
+ --accent:#b4a5ff;--accent-ink:#181328;--soft:#252139;--soft-ink:#ddd4ff;--warn:#ffcf97;--warn-bg:#413427;
+ --ok:#a6eed1;--ok-bg:#233b37;--crit:#ffc1d3;--crit-bg:#402b39;--done:#d5c9ff;--done-bg:#30294a;--chip:#222333;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 var(--font)}
+.wrap{max-width:820px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 64px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance;line-height:1.35}
+h1{font-size:clamp(26px,4vw,32px)}
+h2{font-size:21px;margin-top:34px}
+h3{font-size:16px;margin-top:20px}
+p,ul,ol{margin:8px 0 0}
+ul,ol{padding-left:22px}
+li+li{margin-top:4px}
+a{color:var(--accent)}
+.lead{color:var(--muted);margin-top:6px}
+.top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;font-size:14px;margin-bottom:22px}
+.tabs{display:flex;gap:10px;flex-wrap:wrap;margin:20px 0 6px}
+.tabs button{font:inherit;font-weight:600;cursor:pointer;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:10px;padding:9px 16px}
+.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.tabs button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:6px 24px 26px;margin-top:16px}
+.tip{background:var(--soft);color:var(--soft-ink);border-radius:10px;padding:10px 14px;margin-top:12px}
+.pill{display:inline-block;border-radius:20px;padding:1px 9px;font-size:13px;background:var(--ok-bg);color:var(--ok);white-space:nowrap}
+.pill.watch{background:var(--warn-bg);color:var(--warn)}.pill.active{background:var(--crit-bg);color:var(--crit)}.pill.done{background:var(--done-bg);color:var(--done)}.pill.none{background:var(--chip);color:var(--muted)}
+.table{overflow-x:auto;margin-top:10px}
+table{border-collapse:collapse;width:100%;min-width:460px;font-size:14px}
+th,td{text-align:left;padding:8px 10px;border-top:1px solid var(--line);vertical-align:top}
+th{color:var(--muted);font-weight:600}
+code{font-size:13px;background:var(--chip);padding:1px 6px;border-radius:6px}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+<main class="wrap">
+<div class="top"><a href="./">← กลับไปหน้าระบบ</a><span class="lead" style="margin:0">ลูกเทพศิลปศึกษา</span></div>
+<h1>คู่มือการใช้งาน</h1>
+<p class="lead">ระบบติดตามนักศึกษา สาขาศิลปศึกษา มหาวิทยาลัยราชภัฏเชียงใหม่ · ลองใช้ได้โดยไม่กระทบข้อมูลจริงที่ <a href="./?demo=1">โหมดทดลอง</a></p>
+<div class="tabs" role="tablist" aria-label="เลือกคู่มือ">
+ <button role="tab" id="tab-student" aria-controls="student" aria-selected="true" type="button">สำหรับนักศึกษา</button>
+ <button role="tab" id="tab-teacher" aria-controls="teacher" aria-selected="false" type="button">สำหรับอาจารย์</button>
+</div>
+
+<section class="panel" id="student" role="tabpanel" aria-labelledby="tab-student">
+<h2>ระบบนี้ใช้ทำอะไร</h2>
+<p>อาจารย์ใช้ระบบนี้ติดตามความก้าวหน้าของนักศึกษาสาขาศิลปศึกษาตลอด 4 ปี ตั้งแต่ผลการเรียน การเข้าเรียน ไปจนถึงการสังเกตการสอนและการทดลองสอน</p>
+
+<h2>เข้าสู่ระบบ</h2>
+<ol>
+ <li>เปิดหน้าระบบ แล้วกดปุ่ม <b>ลงชื่อเข้าใช้ด้วย Google</b></li>
+ <li>เลือกบัญชี Google ที่แจ้งไว้กับอาจารย์ที่ปรึกษา</li>
+ <li>ถ้าขึ้นว่า “ยังไม่มีสิทธิ์ใช้งาน” ให้ส่งอีเมลที่ใช้ให้อาจารย์ที่ปรึกษาเพิ่มเข้าระบบ</li>
+</ol>
+<div class="tip">ถ้าใช้เครื่องคอมพิวเตอร์ส่วนกลาง อย่าลืมกด “ออกจากระบบ” ที่มุมขวาบนทุกครั้ง</div>
+
+<h2>สิ่งที่กำลังจะเปิดให้ใช้</h2>
+<ul>
+ <li>ส่งงานพร้อมแนบไฟล์</li>
+ <li>เช็คชื่อด้วยการสแกน QR code ในห้องเรียน</li>
+ <li>ส่งใบลาพร้อมแนบหลักฐาน</li>
+ <li>ดูคะแนนและผลการเรียนของตัวเอง</li>
+</ul>
+<p>ระหว่างนี้ บัญชีนักศึกษายังเข้าดูข้อมูลฝั่งอาจารย์ไม่ได้ ซึ่งเป็นการตั้งค่าที่ตั้งใจไว้</p>
+
+<h2>ข้อมูลส่วนบุคคล</h2>
+<p>ข้อมูลของคุณเก็บใน Google Sheets ของสาขา มีเพียงอาจารย์ที่ได้รับสิทธิ์เท่านั้นที่เปิดดูได้ ไม่ได้เก็บไว้ในหน้าเว็บหรือใน GitHub</p>
+</section>
+
+<section class="panel" id="teacher" role="tabpanel" aria-labelledby="tab-teacher" hidden>
+<h2>เข้าสู่ระบบ</h2>
+<ol>
+ <li>กด <b>ลงชื่อเข้าใช้ด้วย Google</b> ด้วยอีเมลที่ผู้ดูแลเพิ่มไว้ในชีต “ผู้ใช้”</li>
+ <li>หรือกด “ใช้ชื่อผู้ใช้และรหัสผ่านแทน” ถ้าได้รับรหัสผ่านชั่วคราว ครั้งแรกระบบจะให้ตั้งรหัสผ่านใหม่อย่างน้อย 8 ตัวอักษร</li>
+ <li>ระบบจำการเข้าสู่ระบบไว้ 6 ชั่วโมง หลังจากนั้นจะขอให้เข้าสู่ระบบอีกครั้ง</li>
+</ol>
+
+<h2>หน้าภาพรวม</h2>
+<ul>
+ <li><b>แถบแจ้งเตือน</b> บอกจำนวนนักศึกษาที่ถึงกำหนดนัดติดตามแล้ว</li>
+ <li><b>การ์ดสรุป</b> นักศึกษาทั้งหมด จำนวนที่เฝ้าระวัง จำนวนที่กำลังติดตาม และเปอร์เซ็นต์การเข้าเรียนเฉลี่ย</li>
+ <li><b>ตารางรายชื่อ</b> นักศึกษาที่ถึงกำหนดติดตามจะขึ้นก่อนเสมอ ค้นหาด้วยชื่อ รหัส หรือโรงเรียน และกรองตามชั้นปีหรือสถานะได้</li>
+ <li>กด <b>รีเฟรช</b> ที่มุมขวาบนเพื่อดูข้อมูลล่าสุดที่อาจารย์ท่านอื่นแก้ไข</li>
+</ul>
+
+<h2>เพิ่มและแก้ไขข้อมูลนักศึกษา</h2>
+<ol>
+ <li>กด <b>＋ เพิ่มนักศึกษา</b> หรือกด <b>เปิดประวัติ</b> ที่แถวของนักศึกษา</li>
+ <li>ต้องกรอกรหัสนักศึกษาและชื่อ ส่วนช่องอื่นเว้นว่างได้</li>
+ <li>พิมพ์ในช่อง <b>เพิ่มบันทึกการติดตาม</b> เพื่อเก็บประวัติการพูดคุย ระบบบันทึกวันเวลาและชื่อผู้บันทึกให้เอง</li>
+ <li>กด <b>บันทึกข้อมูล</b> แล้วรอประมาณ 1–3 วินาที</li>
+</ol>
+
+<h3>สถานะติดตาม</h3>
+<div class="table"><table>
+<tr><th>สถานะ</th><th>ใช้เมื่อ</th></tr>
+<tr><td><span class="pill">ปกติ</span></td><td>เรียนตามปกติ ไม่มีประเด็นที่ต้องติดตาม</td></tr>
+<tr><td><span class="pill watch">เฝ้าระวัง</span></td><td>เริ่มมีสัญญาณ เช่น เข้าเรียนน้อยลงหรือเกรดลดลง</td></tr>
+<tr><td><span class="pill active">กำลังติดตาม</span></td><td>อาจารย์กำลังพูดคุยหรือช่วยเหลืออยู่ ควรตั้งวันนัดติดตามครั้งถัดไป</td></tr>
+<tr><td><span class="pill done">ติดตามแล้ว</span></td><td>แก้ปัญหาเรียบร้อยแล้ว</td></tr>
+</table></div>
+<p>เมื่อถึงวันนัดของนักศึกษาที่อยู่ในสถานะเฝ้าระวังหรือกำลังติดตาม วันที่ในตารางจะเป็นสีแดง</p>
+
+<h3>สังเกตการสอนและทดลองสอน</h3>
+<p>เลือกได้ 4 สถานะ: <span class="pill none">ยังไม่เริ่ม</span> <span class="pill watch">กำลังดำเนินการ</span> <span class="pill">ผ่าน</span> <span class="pill active">ไม่ผ่าน</span></p>
+
+<h2>นำเข้าและดาวน์โหลด CSV</h2>
+<ul>
+ <li><b>ดาวน์โหลด CSV</b> ได้ไฟล์ตามรายชื่อที่ค้นหาหรือกรองอยู่ เปิดใน Excel หรือ Google Sheets ได้ทันที ภาษาไทยไม่เพี้ยน</li>
+ <li><b>นำเข้า CSV</b> แถวแรกต้องเป็นหัวคอลัมน์ และต้องมีคอลัมน์ <code>รหัสนักศึกษา</code> กับ <code>ชื่อ–นามสกุล</code></li>
+ <li>หัวคอลัมน์อื่นใช้ชื่อเดียวกับไฟล์ที่ดาวน์โหลด เช่น <code>ชั้นปี</code> <code>เทอม</code> <code>เกรดเฉลี่ยปัจจุบัน</code> <code>สังเกตการสอน</code></li>
+ <li>รหัสที่มีอยู่แล้วจะอัปเดตเฉพาะช่องที่มีค่า ช่องว่างจะไม่ลบข้อมูลเดิม และประวัติการติดตามยังอยู่ครบ</li>
+ <li>วันที่ใส่ได้ทั้ง <code>2026-11-18</code> และ <code>18/11/2569</code></li>
+ <li>ก่อนนำเข้า ระบบจะสรุปให้ดูว่าเพิ่มใหม่กี่คน อัปเดตกี่คน และข้ามกี่แถว</li>
+</ul>
+
+<h2>สำหรับผู้ดูแลระบบ</h2>
+<ul>
+ <li><b>เพิ่มอาจารย์:</b> ใส่อีเมล ชื่อที่แสดง และบทบาท “อาจารย์” ในชีต “ผู้ใช้” ถ้าใช้ Google Sign-In ไม่ต้องใส่รหัสผ่าน</li>
+ <li><b>ปิดบัญชี:</b> พิมพ์ <code>ปิด</code> ในช่อง “ปิดการใช้งาน”</li>
+ <li><b>ลืมรหัสผ่าน:</b> ลบช่อง salt และ hash แล้วใส่รหัสผ่านชั่วคราวใหม่</li>
+ <li>แชร์ไฟล์ Google Sheet เฉพาะผู้ดูแล เพราะเป็นข้อมูลส่วนบุคคลของนักศึกษา (PDPA)</li>
+</ul>
+
+<h2>โหมดทดลอง</h2>
+<p>เปิด <a href="./?demo=1">โหมดทดลอง</a> เพื่อฝึกใช้งานด้วยข้อมูลตัวอย่าง ทุกอย่างที่เพิ่ม แก้ หรือลบจะหายไปเมื่อปิดหน้า และไม่กระทบข้อมูลจริง</p>
+</section>
+</main>
+<script>
+const tabs=[...document.querySelectorAll('[role="tab"]')];
+function show(id,focus){
+ for(const t of tabs){const on=t.getAttribute('aria-controls')===id;t.setAttribute('aria-selected',on);t.tabIndex=on?0:-1;document.getElementById(t.getAttribute('aria-controls')).hidden=!on;if(on&&focus)t.focus();}
+}
+tabs.forEach((t,i)=>{
+ t.onclick=()=>{show(t.getAttribute('aria-controls'));history.replaceState(null,'','#'+t.getAttribute('aria-controls'));};
+ t.onkeydown=e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){const n=tabs[(i+(e.key==='ArrowRight'?1:tabs.length-1))%tabs.length];show(n.getAttribute('aria-controls'),true);}};
+});
+show(location.hash==='#teacher'?'teacher':'student');
+addEventListener('hashchange',()=>show(location.hash==='#teacher'?'teacher':'student'));
+try{const t=localStorage.getItem('lukthep-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;}catch{}
+</script>

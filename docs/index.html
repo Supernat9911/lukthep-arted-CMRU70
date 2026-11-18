@@ -94,14 +94,24 @@ label input,label select,label textarea{width:100%;min-width:0}
 .history p{white-space:pre-wrap;overflow-wrap:anywhere;margin:4px 0 10px}
 .error{color:var(--crit);min-height:1.2em}
 .overdue{color:var(--crit);font-weight:600}
-#loginForm{display:grid;gap:12px;margin-top:14px}
-#loginForm .muted{font-size:13px}
+#login{width:min(520px,94vw);padding:44px 28px 36px;text-align:center}
+#login::backdrop{background:var(--bg)}
+#login h2{font-size:26px}
+#login .sub{margin-top:6px}
+#gbtn{display:flex;justify-content:center;min-height:44px;margin-top:26px}
+#loginForm{display:grid;gap:12px;margin-top:22px;text-align:left}
+.links{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:22px}
+a{color:var(--accent)}
+.linkbtn{background:none;border:0;padding:0;color:var(--accent);text-decoration:underline;font-weight:500}
+.demo-bar{background:var(--warn-bg);color:var(--warn);text-align:center;padding:8px 16px;font-weight:600}
+.demo-bar a{color:inherit}
 #confirmText{margin:12px 0 18px;white-space:pre-wrap}
 #toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));right:calc(20px + env(safe-area-inset-right,0px));background:var(--toast);color:var(--toast-ink);padding:12px 18px;border-radius:10px;z-index:10;max-width:calc(100vw - 40px)}
 @media(max-width:650px){.stats{grid-template-columns:repeat(2,1fr)}main{padding-top:24px}.toolbar{align-items:flex-start}.filters,.filters input{width:100%}.mode{margin-left:0}.fields{grid-template-columns:1fr;gap:8px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
-<header><div class="wrap"><div class="logo" aria-hidden="true">ศ</div><div><div class="brand">ลูกเทพศิลปศึกษา</div><div class="muted">สาขาศิลปศึกษา มหาวิทยาลัยราชภัฏเชียงใหม่</div></div><div class="mode"><small id="mode">ข้อมูลบันทึกในเบราว์เซอร์นี้</small><button id="refresh" class="ghost" type="button" hidden>รีเฟรช</button><small id="who" hidden></small><button id="logout" class="ghost" type="button" hidden>ออกจากระบบ</button><button id="theme" class="ghost" type="button" hidden></button></div></div></header>
+<div class="demo-bar" id="demoBar" hidden>โหมดทดลอง · ข้อมูลในหน้านี้ไม่ถูกบันทึก และไม่กระทบข้อมูลจริง · <a href="./">ออกจากโหมดทดลอง</a></div>
+<header><div class="wrap"><div class="logo" aria-hidden="true">ศ</div><div><div class="brand">ลูกเทพศิลปศึกษา</div><div class="muted">สาขาศิลปศึกษา มหาวิทยาลัยราชภัฏเชียงใหม่</div></div><div class="mode"><small id="mode">ข้อมูลบันทึกในเบราว์เซอร์นี้</small><button id="refresh" class="ghost" type="button" hidden>รีเฟรช</button><small id="who" hidden></small><button id="logout" class="ghost" type="button" hidden>ออกจากระบบ</button><a id="guideLink" href="guide.html" hidden>คู่มือ</a><button id="theme" class="ghost" type="button" hidden></button></div></div></header>
 <main class="wrap"><div class="row intro"><div><h1>ภาพรวมการติดตามนักศึกษา</h1><p class="muted">นักศึกษา · ประวัติการศึกษา · การเข้าเรียน · นัดหมายติดตาม</p></div><div class="row"><label class="filebtn" id="importWrap">นำเข้า CSV<input id="import" type="file" accept=".csv,text/csv"></label><button id="export" type="button">ดาวน์โหลด CSV</button><button id="add" class="primary" type="button">＋ เพิ่มนักศึกษา</button></div></div>
 <div class="notice" id="notice"><span id="alert">กำลังโหลดข้อมูล…</span><button id="clearDemo" class="ghost" type="button" hidden>ลบข้อมูลตัวอย่าง</button></div>
 <section class="stats" aria-label="สรุปการติดตาม" id="stats"></section>
@@ -119,16 +129,20 @@ label input,label select,label textarea{width:100%;min-width:0}
 <label class="wide">เพิ่มบันทึกการติดตาม<textarea id="f-note" name="note" rows="3" maxlength="2000" placeholder="การติดต่อ ผลการพูดคุย หรือสิ่งที่ต้องทำต่อ"></textarea></label></div>
 <p id="error" class="error" role="alert"></p><div class="row between"><button id="remove" type="button" class="danger">ลบข้อมูล</button><button id="submit" class="primary" type="submit">บันทึกข้อมูล</button></div></form><section class="history" id="history"></section></dialog>
 <dialog id="confirm" class="small" aria-labelledby="confirmTitle"><h2 id="confirmTitle">ยืนยัน</h2><p id="confirmText"></p><div class="row between"><button id="confirmNo" type="button">ยกเลิก</button><button id="confirmYes" type="button" class="primary"></button></div></dialog>
-<dialog id="login" class="small" aria-labelledby="loginTitle"><h2 id="loginTitle">เข้าสู่ระบบ</h2><p class="muted">สำหรับอาจารย์ผู้ดูแล ข้อมูลนักศึกษาเก็บใน Google Sheets ของสาขา</p>
+<dialog id="login" aria-labelledby="loginTitle"><h2 id="loginTitle">เข้าสู่ระบบ</h2><p class="muted sub" id="loginSub">กรุณาเข้าสู่ระบบ</p>
+<div id="gbtn" hidden></div>
 <form id="loginForm"><label>อีเมลหรือชื่อผู้ใช้<input id="l-user" autocomplete="username" required maxlength="200"></label>
 <label>รหัสผ่าน<input id="l-pass" type="password" autocomplete="current-password" required></label>
 <label id="newWrap" hidden>ตั้งรหัสผ่านใหม่ (อย่างน้อย 8 ตัวอักษร)<input id="l-new" type="password" autocomplete="new-password" minlength="8"></label>
-<p id="loginError" class="error" role="alert"></p><button id="loginBtn" class="primary" type="submit">เข้าสู่ระบบ</button>
-<p class="muted">ยังไม่มีบัญชี ให้ผู้ดูแลเพิ่มชื่อคุณในชีต “ผู้ใช้” พร้อมรหัสผ่านชั่วคราว</p></form></dialog>
+<button id="loginBtn" class="primary" type="submit">เข้าสู่ระบบ</button></form>
+<p id="loginError" class="error" role="alert"></p>
+<div class="links"><button id="usePassword" class="linkbtn" type="button" hidden>ใช้ชื่อผู้ใช้และรหัสผ่านแทน</button><a href="guide.html">คู่มือการใช้งาน</a><a href="?demo=1">ลองโหมดทดลอง</a></div></dialog>
 <div id="toast" role="status" hidden></div>
 <script>
 /* ใส่ URL ของ Google Apps Script Web App (ลงท้ายด้วย /exec) เพื่อเก็บข้อมูลใน Google Sheets ว่างไว้ = เก็บในเบราว์เซอร์ */
 const SHEETS_API = '';
+/* Client ID ของ Google Sign-In (ลงท้ายด้วย .apps.googleusercontent.com) ว่างไว้ = ใช้ชื่อผู้ใช้และรหัสผ่าน */
+const GOOGLE_CLIENT_ID = '';
 const $ = id => document.getElementById(id);
 const statuses = {normal:'ปกติ',watch:'เฝ้าระวัง',active:'กำลังติดตาม',done:'ติดตามแล้ว'};
 const stages = {none:'ยังไม่เริ่ม',doing:'กำลังดำเนินการ',pass:'ผ่าน',fail:'ไม่ผ่าน'};
@@ -140,7 +154,8 @@ const date = value => value ? new Intl.DateTimeFormat('th-TH',{dateStyle:'medium
 const stamp = value => new Intl.DateTimeFormat('th-TH',{dateStyle:'medium',timeStyle:'short',timeZone:TZ}).format(new Date(value));
 const KEY = 'lukthep-student-records-v1', THEME_KEY = 'lukthep-theme';
 const inViewer = typeof window.claude?.use === 'function';
-const useSheets = !inViewer && !!SHEETS_API;
+const demoMode = !inViewer && new URLSearchParams(location.search).has('demo');
+const useSheets = !inViewer && !demoMode && !!SHEETS_API;
 const SESSION_KEY = 'lukthep-session';
 
 /* ---------- data shape ---------- */
@@ -180,10 +195,11 @@ const examples = [
 /* ---------- storage: browser (default) or shared db (published artifact) ---------- */
 const local = {
  load(){
+  if(demoMode)return examples.map(r=>({...r}));
   try{const raw=JSON.parse(localStorage.getItem(KEY));return Array.isArray(raw)?raw.map(clean).filter(r=>r.id&&r.name):examples;}
   catch{return examples;}
  },
- write(next){localStorage.setItem(KEY,JSON.stringify(next.map(({_doc,...r})=>r)));records=next;render();}
+ write(next){if(demoMode){records=next;render();return;}localStorage.setItem(KEY,JSON.stringify(next.map(({_doc,...r})=>r)));records=next;render();}
 };
 async function api(action,payload={}){
  const ctrl=new AbortController(),t=setTimeout(()=>ctrl.abort(),45000);
@@ -348,7 +364,7 @@ async function open(record){
 }
 function writeFailed(e){
  if(store.mode==='sheets'){
-  if(e?.code==='auth'){showLogin();return 'หมดเวลาเข้าสู่ระบบ โปรดเข้าสู่ระบบอีกครั้งแล้วบันทึกใหม่';}
+  if(e?.code==='auth'){showLogin(true);return 'หมดเวลาเข้าสู่ระบบ โปรดเข้าสู่ระบบอีกครั้งแล้วบันทึกใหม่';}
   return e?.message||'บันทึกไม่สำเร็จ';
  }
  if(e?.code==='invalid_argument'&&store.mode==='db'){store.canWrite=false;render();return 'คุณมีสิทธิ์ดูข้อมูลอย่างเดียว จึงบันทึกการเปลี่ยนแปลงไม่ได้';}
@@ -472,9 +488,34 @@ if(!inViewer){
 }
 
 /* ---------- Google Sheets mode ---------- */
-function showLogin(){
+function showLogin(again){
  $('loginError').textContent='';$('l-pass').value='';$('l-new').value='';$('newWrap').hidden=true;
+ $('loginSub').textContent=again?'กรุณาเข้าสู่ระบบอีกครั้ง':'กรุณาเข้าสู่ระบบ';
  if(!$('login').open)$('login').showModal();
+}
+async function signedIn(r){
+ store.session={token:r.token,name:r.name,role:r.role};
+ try{localStorage.setItem(SESSION_KEY,JSON.stringify(store.session));}catch{}
+ $('login').close();updateWho();toast('ยินดีต้อนรับ '+r.name);
+ await loadSheets();
+}
+function setupGoogle(){
+ const usePw=()=>{$('loginForm').hidden=false;$('usePassword').hidden=true;};
+ $('usePassword').onclick=usePw;
+ if(!GOOGLE_CLIENT_ID){usePw();return;}
+ $('loginForm').hidden=true;$('usePassword').hidden=false;$('gbtn').hidden=false;
+ const script=document.createElement('script');
+ script.src='https://accounts.google.com/gsi/client';script.async=true;
+ script.onerror=()=>{$('loginError').textContent='โหลดปุ่ม Google ไม่ได้ ใช้ชื่อผู้ใช้และรหัสผ่านแทนได้';usePw();};
+ script.onload=()=>{
+  google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,auto_select:true,callback:async({credential})=>{
+   $('loginError').textContent='กำลังตรวจสอบบัญชี…';
+   try{await signedIn(await api('googleLogin',{credential}));}
+   catch(err){$('loginError').textContent=err.message;}
+  }});
+  google.accounts.id.renderButton($('gbtn'),{theme:'outline',size:'large',shape:'pill',text:'signin_with',locale:'th'});
+ };
+ document.head.append(script);
 }
 function updateWho(){
  const s=store.session;
@@ -486,7 +527,7 @@ async function loadSheets(){
  try{fromServer(await api('bootstrap'));}
  catch(e){
   loading=false;
-  if(e.code==='auth'){store.session=null;updateWho();showLogin();}
+  if(e.code==='auth'){store.session=null;updateWho();showLogin(true);}
   else loadProblem='โหลดข้อมูลไม่สำเร็จ: '+e.message;
   render();
  }
@@ -499,10 +540,7 @@ $('loginForm').onsubmit=async e=>{
  $('loginBtn').disabled=true;$('loginError').textContent='';
  try{
   const r=await api('login',{username:$('l-user').value.trim(),password:$('l-pass').value,newPassword});
-  store.session={token:r.token,name:r.name,role:r.role};
-  try{localStorage.setItem(SESSION_KEY,JSON.stringify(store.session));}catch{}
-  $('login').close();updateWho();toast('ยินดีต้อนรับ '+r.name);
-  await loadSheets();
+  await signedIn(r);
  }catch(err){
   if(err.code==='must_change'){$('newWrap').hidden=false;$('l-new').required=true;$('l-new').focus();}
   $('loginError').textContent=err.message;
@@ -513,19 +551,23 @@ $('logout').onclick=async()=>{
  store.session=null;records=[];updateWho();render();
  try{localStorage.removeItem(SESSION_KEY);}catch{}
  if(token)api('logout',{token}).catch(()=>{});
+ try{google.accounts.id.disableAutoSelect();}catch{}
  showLogin();
 };
 $('refresh').onclick=()=>loadSheets();
 
 /* ---------- boot ---------- */
 render();
+if(!inViewer)$('guideLink').hidden=false;
+if(demoMode){$('demoBar').hidden=false;$('mode').textContent='โหมดทดลอง';}
 if(useSheets){
+ setupGoogle();
  store.mode='sheets';
  $('mode').textContent='ข้อมูลเก็บใน Google Sheets';
  try{store.session=JSON.parse(localStorage.getItem(SESSION_KEY));}catch{}
  if(!store.session?.token)store.session=null;
  updateWho();
- if(store.session)loadSheets();else{loading=false;render();showLogin();}
+ if(store.session)loadSheets();else{loading=false;render();showLogin(false);}
 }
 if(inViewer)(async()=>{
  const [db,user]=await Promise.all([claude.use('db'),claude.use('user')]);

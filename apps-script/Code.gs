@@ -6,7 +6,9 @@
  * ทุกคำตอบเป็น JSON {ok: true, ...} หรือ {ok: false, code, message}
  */
 
-var APP_VERSION = '1.0.0';
+var APP_VERSION = '1.1.0';
+/** Client ID ของ Google Sign-In (ค่าเดียวกับในหน้าเว็บ) ว่างไว้ = ปิดการเข้าสู่ระบบด้วย Google */
+var GOOGLE_CLIENT_ID = '';
 var SESSION_SECONDS = 6 * 60 * 60;   // อยู่ในระบบได้ 6 ชั่วโมง (สูงสุดของ CacheService)
 var MAX_LOGIN_FAILS = 5;             // ใส่รหัสผิดเกินนี้ ล็อก 15 นาที
 var HASH_ROUNDS = 300;
@@ -78,6 +80,7 @@ function doPost(e) {
 function route_(p) {
   switch (p.action) {
     case 'login': return login_(p);
+    case 'googleLogin': return googleLogin_(p);
     case 'logout': CacheService.getScriptCache().remove('s:' + p.token); return {};
   }
   var s = session_(p.token);
@@ -123,12 +126,36 @@ function login_(p) {
       setPassword_(users, i, next);
     }
     cache.remove(failKey);
-    var role = /นักศึกษา|student/i.test(String(u.role)) ? 'student' : 'teacher';
-    var s = { username: username, name: str_(u.name, 120) || username, role: role };
-    var token = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
-    cache.put('s:' + token, JSON.stringify(s), SESSION_SECONDS);
-    return { token: token, name: s.name, role: s.role };
+    return startSession_(u, username, '');
   });
+}
+
+/** เข้าสู่ระบบด้วย Google: ตรวจ ID token กับ Google แล้วจับคู่อีเมลกับชีต "ผู้ใช้" */
+function googleLogin_(p) {
+  if (!GOOGLE_CLIENT_ID) throw fail_('not_setup', 'ยังไม่ได้เปิดใช้การเข้าสู่ระบบด้วย Google');
+  var credential = String(p.credential || '');
+  if (!credential) throw fail_('auth_failed', 'ไม่ได้รับข้อมูลบัญชี Google');
+  var res = UrlFetchApp.fetch('https://oauth2.googleapis.com/tokeninfo?id_token=' + encodeURIComponent(credential), { muteHttpExceptions: true });
+  if (res.getResponseCode() !== 200) throw fail_('auth_failed', 'ยืนยันตัวตนกับ Google ไม่สำเร็จ โปรดลองอีกครั้ง');
+  var info = JSON.parse(res.getContentText());
+  var issuerOk = info.iss === 'accounts.google.com' || info.iss === 'https://accounts.google.com';
+  if (info.aud !== GOOGLE_CLIENT_ID || !issuerOk || String(info.email_verified) !== 'true' || Number(info.exp) * 1000 < Date.now()) {
+    throw fail_('auth_failed', 'ยืนยันตัวตนกับ Google ไม่สำเร็จ โปรดลองอีกครั้ง');
+  }
+  var email = String(info.email).trim().toLowerCase();
+  var u = readTable_('users').filter(function (x) {
+    return String(x.username).trim().toLowerCase() === email && String(x.active).trim() !== 'ปิด';
+  })[0];
+  if (!u) throw fail_('no_access', 'บัญชี ' + email + ' ยังไม่มีสิทธิ์ใช้งาน โปรดแจ้งผู้ดูแลให้เพิ่มอีเมลนี้ในระบบ');
+  return startSession_(u, email, str_(info.name, 120));
+}
+
+function startSession_(u, username, fallbackName) {
+  var role = /นักศึกษา|student/i.test(String(u.role)) ? 'student' : 'teacher';
+  var s = { username: username, name: str_(u.name, 120) || fallbackName || username, role: role };
+  var token = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
+  CacheService.getScriptCache().put('s:' + token, JSON.stringify(s), SESSION_SECONDS);
+  return { token: token, name: s.name, role: s.role };
 }
 
 function changePassword_(s, p) {

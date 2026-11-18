@@ -37,6 +37,23 @@
 
 URL นี้ไม่ใช่ความลับ เพราะทุกคำขอต้องล็อกอินก่อน
 
+## 5. เปิดใช้ “ลงชื่อเข้าใช้ด้วย Google” (แนะนำ)
+1. เปิด https://console.cloud.google.com/ แล้วสร้างโปรเจกต์ใหม่ (ชื่ออะไรก็ได้ เช่น `lukthep`)
+2. ไปที่ **APIs & Services → OAuth consent screen**
+   - User type: **External** → ใส่ชื่อแอป `ลูกเทพศิลปศึกษา` และอีเมลติดต่อ → Save
+   - ที่หน้า **Audience** กด **Publish app** เพื่อให้ทุกบัญชี Google ใช้ได้
+3. ไปที่ **APIs & Services → Credentials → Create credentials → OAuth client ID**
+   - Application type: **Web application**
+   - Authorized JavaScript origins: ใส่ `https://supernat9911.github.io`
+   - กด Create แล้วคัดลอก **Client ID** (ลงท้ายด้วย `.apps.googleusercontent.com`)
+4. ใส่ Client ID ใน 2 ที่ (Client ID ไม่ใช่ความลับ):
+   - `Code.gs` ที่บรรทัด `var GOOGLE_CLIENT_ID = '';` แล้ว Deploy เวอร์ชันใหม่ (ดูหัวข้อถัดไป)
+   - `src/app.html` ที่บรรทัด `const GOOGLE_CLIENT_ID = '';` (หรือส่งให้ผู้ดูแลเว็บ)
+5. รันฟังก์ชัน `setup` อีกครั้ง 1 ครั้ง แล้วกดอนุญาตสิทธิ์ใหม่ (ระบบต้องใช้สิทธิ์ “เชื่อมต่อบริการภายนอก” เพื่อตรวจบัญชีกับ Google)
+6. ในชีต **ผู้ใช้** ใส่อีเมล Google ของอาจารย์ ไม่ต้องใส่รหัสผ่าน
+
+ถ้ายังไม่ได้ตั้งค่าขั้นนี้ หน้าเว็บจะใช้ชื่อผู้ใช้และรหัสผ่านแทนโดยอัตโนมัติ
+
 ## เมื่อแก้โค้ด Code.gs ภายหลัง
 กด **Deploy → Manage deployments → ✏️ Edit → Version: New version → Deploy** ทำแบบนี้แล้ว URL เดิมจะยังใช้ได้
 (ถ้ากด New deployment จะได้ URL ใหม่)
