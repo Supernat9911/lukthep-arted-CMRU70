@@ -62,18 +62,20 @@ button.ghost{background:transparent;border-color:transparent;padding:6px 9px}
 .filebtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .filebtn{position:relative;display:inline-block}
 .table{overflow-x:auto}
-table{width:100%;min-width:1040px;border-collapse:collapse;text-align:left}
+table{width:100%;min-width:1180px;border-collapse:collapse;text-align:left}
 th,td{padding:12px;border-top:1px solid var(--line);vertical-align:middle}
 th:first-child,td:first-child{padding-left:18px}
 th{color:var(--muted);background:var(--panel-2);font-size:12px;white-space:nowrap}
 td{font-variant-numeric:tabular-nums}
-td small{display:block}
+td{white-space:nowrap}
+td small{display:block;white-space:normal;max-width:240px}
 .avatar{width:33px;height:33px;border-radius:10px}
 .person{display:flex;align-items:center;gap:9px;white-space:nowrap}
 .pill{display:inline-block;border-radius:20px;padding:3px 9px;font-size:12px;background:var(--ok-bg);color:var(--ok);white-space:nowrap}
 .pill.watch{background:var(--warn-bg);color:var(--warn)}
 .pill.active{background:var(--crit-bg);color:var(--crit)}
 .pill.done{background:var(--done-bg);color:var(--done)}
+.pill.none{background:var(--panel-2);color:var(--muted)}
 .foot{padding:14px 18px;border-top:1px solid var(--line)}
 dialog{width:min(660px,94vw);max-height:90dvh;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:22px}
 dialog.small{width:min(420px,94vw)}
@@ -96,15 +98,17 @@ label input,label select,label textarea{width:100%;min-width:0}
 <main class="wrap"><div class="row intro"><div><h1>ภาพรวมการติดตามนักศึกษา</h1><p class="muted">นักศึกษา · ประวัติการศึกษา · การเข้าเรียน · นัดหมายติดตาม</p></div><div class="row"><label class="filebtn" id="importWrap">นำเข้า CSV<input id="import" type="file" accept=".csv,text/csv"></label><button id="export" type="button">ดาวน์โหลด CSV</button><button id="add" class="primary" type="button">＋ เพิ่มนักศึกษา</button></div></div>
 <div class="notice" id="notice"><span id="alert">กำลังโหลดข้อมูล…</span><button id="clearDemo" class="ghost" type="button" hidden>ลบข้อมูลตัวอย่าง</button></div>
 <section class="stats" aria-label="สรุปการติดตาม" id="stats"></section>
-<section class="panel"><div class="toolbar"><h2>รายชื่อนักศึกษา</h2><div class="filters"><input id="search" type="search" placeholder="ค้นหาชื่อ รหัส หรือโรงเรียน" aria-label="ค้นหาชื่อ รหัส หรือโรงเรียน"><select id="filter" aria-label="กรองสถานะ"><option value="">ทุกสถานะ</option></select></div></div>
-<div class="table"><table><thead><tr><th>นักศึกษา</th><th>โรงเรียนที่จบมา</th><th>เกรดเฉลี่ยเดิม</th><th>เข้าเรียน</th><th>ขาดเรียน</th><th>งานค้าง</th><th>สถานะติดตาม</th><th>นัดครั้งถัดไป</th><th>จัดการ</th></tr></thead><tbody id="rows"></tbody></table></div><div id="count" class="foot muted"></div></section></main>
+<section class="panel"><div class="toolbar"><h2>รายชื่อนักศึกษา</h2><div class="filters"><input id="search" type="search" placeholder="ค้นหาชื่อ รหัส หรือโรงเรียน" aria-label="ค้นหาชื่อ รหัส หรือโรงเรียน"><select id="yearFilter" aria-label="กรองชั้นปี"><option value="">ทุกชั้นปี</option></select><select id="filter" aria-label="กรองสถานะ"><option value="">ทุกสถานะ</option></select></div></div>
+<div class="table"><table><thead><tr><th>นักศึกษา</th><th>ชั้นปี / เทอม</th><th>โรงเรียนที่จบมา</th><th>เกรดเฉลี่ยเดิม</th><th>เกรดเฉลี่ยปัจจุบัน</th><th>เข้าเรียน</th><th>สังเกตการสอน</th><th>ทดลองสอน</th><th>สถานะติดตาม</th><th>นัดครั้งถัดไป</th><th>จัดการ</th></tr></thead><tbody id="rows"></tbody></table></div><div id="count" class="foot muted"></div></section></main>
 <dialog id="editor" aria-labelledby="dialogTitle"><div class="row between"><h2 id="dialogTitle"></h2><button id="close" aria-label="ปิด" type="button" class="ghost">✕</button></div><form id="form"><div class="fields">
 <label>รหัสนักศึกษา<input id="f-id" name="id" required maxlength="30"></label><label>ชื่อ–นามสกุล<input id="f-name" name="name" required maxlength="120"></label>
+<label>ชั้นปี<select id="f-year" name="year"><option value="">—</option><option value="1">ปี 1</option><option value="2">ปี 2</option><option value="3">ปี 3</option><option value="4">ปี 4</option></select></label><label>เทอม<select id="f-term" name="term"><option value="">—</option><option value="1">เทอม 1</option><option value="2">เทอม 2</option></select></label>
 <label>โรงเรียนที่จบมา<input id="f-school" name="school" maxlength="150"></label><label>เกรดเฉลี่ยเดิม<input id="f-gpa" name="gpa" type="number" min="0" max="4" step="0.01"></label>
+<label>เกรดเฉลี่ยปัจจุบัน<input id="f-gpaNow" name="gpaNow" type="number" min="0" max="4" step="0.01"></label><label>เข้าเรียน (%)<input id="f-attendance" name="attendance" type="number" min="0" max="100"></label>
+<label>สังเกตการสอน<select id="f-observe" name="observe"></select></label><label>ทดลองสอน<select id="f-practice" name="practice"></select></label>
 <label>ช่องทางติดต่อ<input id="f-contact" name="contact" maxlength="150"></label><label>ผู้รับผิดชอบติดตาม<input id="f-advisor" name="advisor" maxlength="120"></label>
-<label>เข้าเรียน (%)<input id="f-attendance" name="attendance" type="number" min="0" max="100"></label><label>ขาดเรียน (ครั้ง)<input id="f-absence" name="absence" type="number" min="0" step="1"></label>
-<label>งานค้าง (ชิ้น)<input id="f-missing" name="missing" type="number" min="0" step="1"></label><label>สถานะติดตาม<select id="f-status" name="status"></select></label>
-<label>นัดติดตามครั้งถัดไป<input id="f-due" name="due" type="date"></label><label>ประเด็นที่ติดตาม<input id="f-issue" name="issue" maxlength="200"></label>
+<label>สถานะติดตาม<select id="f-status" name="status"></select></label><label>นัดติดตามครั้งถัดไป<input id="f-due" name="due" type="date"></label>
+<label class="wide">ประเด็นที่ติดตาม<input id="f-issue" name="issue" maxlength="200"></label>
 <label class="wide">เพิ่มบันทึกการติดตาม<textarea id="f-note" name="note" rows="3" maxlength="2000" placeholder="การติดต่อ ผลการพูดคุย หรือสิ่งที่ต้องทำต่อ"></textarea></label></div>
 <p id="error" class="error" role="alert"></p><div class="row between"><button id="remove" type="button" class="danger">ลบข้อมูล</button><button id="submit" class="primary" type="submit">บันทึกข้อมูล</button></div></form><section class="history" id="history"></section></dialog>
 <dialog id="confirm" class="small" aria-labelledby="confirmTitle"><h2 id="confirmTitle">ยืนยัน</h2><p id="confirmText"></p><div class="row between"><button id="confirmNo" type="button">ยกเลิก</button><button id="confirmYes" type="button" class="primary"></button></div></dialog>
@@ -112,7 +116,9 @@ label input,label select,label textarea{width:100%;min-width:0}
 <script>
 const $ = id => document.getElementById(id);
 const statuses = {normal:'ปกติ',watch:'เฝ้าระวัง',active:'กำลังติดตาม',done:'ติดตามแล้ว'};
-const FIELDS = {id:'รหัสนักศึกษา',name:'ชื่อ–นามสกุล',school:'โรงเรียนที่จบมา',gpa:'เกรดเฉลี่ยเดิม',attendance:'เข้าเรียน (%)',absence:'ขาดเรียน',missing:'งานค้าง',status:'สถานะติดตาม',due:'นัดติดตามครั้งถัดไป',contact:'ช่องทางติดต่อ',advisor:'ผู้รับผิดชอบ',issue:'ประเด็นติดตาม'};
+const stages = {none:'ยังไม่เริ่ม',doing:'กำลังดำเนินการ',pass:'ผ่าน',fail:'ไม่ผ่าน'};
+const stagePill = {none:'none',doing:'watch',pass:'normal',fail:'active'};
+const FIELDS = {id:'รหัสนักศึกษา',name:'ชื่อ–นามสกุล',year:'ชั้นปี',term:'เทอม',school:'โรงเรียนที่จบมา',gpa:'เกรดเฉลี่ยเดิม',gpaNow:'เกรดเฉลี่ยปัจจุบัน',attendance:'เข้าเรียน (%)',observe:'สังเกตการสอน',practice:'ทดลองสอน',status:'สถานะติดตาม',due:'นัดติดตามครั้งถัดไป',contact:'ช่องทางติดต่อ',advisor:'ผู้รับผิดชอบ',issue:'ประเด็นติดตาม'};
 const TZ = 'Asia/Bangkok';
 const today = () => new Intl.DateTimeFormat('en-CA',{timeZone:TZ}).format(new Date());
 const date = value => value ? new Intl.DateTimeFormat('th-TH',{dateStyle:'medium',timeZone:TZ}).format(new Date(value)) : '—';
@@ -139,20 +145,20 @@ function isoDate(v){
 }
 function clean(r){
  r=r&&typeof r==='object'?r:{};
- return {id:str(r.id,30),name:str(r.name,120),school:str(r.school,150),gpa:num(r.gpa,0,4),attendance:num(r.attendance,0,100),
-  absence:num(r.absence,0,null,true),missing:num(r.missing,0,null,true),status:statuses[r.status]?r.status:'normal',due:isoDate(r.due),
+ return {id:str(r.id,30),name:str(r.name,120),school:str(r.school,150),gpa:num(r.gpa,0,4),gpaNow:num(r.gpaNow,0,4),attendance:num(r.attendance,0,100),
+  year:[1,2,3,4].includes(+r.year)?+r.year:'',term:[1,2].includes(+r.term)?+r.term:'',observe:stages[r.observe]?r.observe:'none',practice:stages[r.practice]?r.practice:'none',status:statuses[r.status]?r.status:'normal',due:isoDate(r.due),
   issue:str(r.issue,200),contact:str(r.contact,150),advisor:str(r.advisor,120),
   notes:Array.isArray(r.notes)?r.notes.filter(n=>n&&typeof n.text==='string'&&n.at).map(n=>({at:String(n.at),text:n.text.slice(0,2000),...(n.by?{by:String(n.by)}:{})})):[],
   demo:!!r.demo};
 }
 const examples = [
- ['ตัวอย่าง 01','กานต์ ธาราศิลป์','โรงเรียนศิลป์ศึกษา',3.45,95,0,0,'normal'],
- ['ตัวอย่าง 02','พิมพ์ชนก แสงดาว','โรงเรียนเมืองวิทยา',2.78,67,2,2,'active'],
- ['ตัวอย่าง 03','ธนกฤต วาดฝัน','โรงเรียนเทศบาลวิทยา',3.12,76,1,1,'watch'],
- ['ตัวอย่าง 04','ศิรินภา พูนศิลป์','โรงเรียนศิลป์ศึกษา',3.80,100,0,0,'normal'],
- ['ตัวอย่าง 05','ภาคิน จันทร์ทอง','โรงเรียนชุมชนศึกษา',3.28,90,1,0,'done'],
- ['ตัวอย่าง 06','ณัฐธิดา มีแสง','โรงเรียนเมืองวิทยา',2.96,75,2,1,'watch']
-].map(([id,name,school,gpa,attendance,absence,missing,status])=>clean({id,name,school,gpa,attendance,absence,missing,status,due:status==='active'?today():'',issue:status==='active'?'เข้าเรียนต่ำกว่า 80% และมีงานค้าง':'',demo:true}));
+ ['ตัวอย่าง 01','กานต์ ธาราศิลป์',4,1,'โรงเรียนศิลป์ศึกษา',3.45,3.52,95,'pass','doing','normal'],
+ ['ตัวอย่าง 02','พิมพ์ชนก แสงดาว',2,1,'โรงเรียนเมืองวิทยา',2.78,2.31,67,'none','none','active'],
+ ['ตัวอย่าง 03','ธนกฤต วาดฝัน',3,1,'โรงเรียนเทศบาลวิทยา',3.12,2.88,76,'doing','none','watch'],
+ ['ตัวอย่าง 04','ศิรินภา พูนศิลป์',4,1,'โรงเรียนศิลป์ศึกษา',3.80,3.71,100,'pass','pass','normal'],
+ ['ตัวอย่าง 05','ภาคิน จันทร์ทอง',1,2,'โรงเรียนชุมชนศึกษา',3.28,3.10,90,'none','none','done'],
+ ['ตัวอย่าง 06','ณัฐธิดา มีแสง',3,1,'โรงเรียนเมืองวิทยา',2.96,2.64,75,'fail','none','watch']
+].map(([id,name,year,term,school,gpa,gpaNow,attendance,observe,practice,status])=>clean({id,name,year,term,school,gpa,gpaNow,attendance,observe,practice,status,due:status==='active'?today():'',issue:status==='active'?'เข้าเรียนต่ำกว่า 80% และเกรดเฉลี่ยลดลง':'',demo:true}));
 
 /* ---------- storage: browser (default) or shared db (published artifact) ---------- */
 const local = {
@@ -192,6 +198,8 @@ let records = inViewer ? [] : local.load();
 let loading = inViewer, loadProblem = '';
 let editing = null, timer;
 const form = $('form');
+for(const [value,label] of Object.entries(stages)){form.elements.observe.add(new Option(label,value));form.elements.practice.add(new Option(label,value));}
+for(const y of [1,2,3,4])$('yearFilter').add(new Option('ปี '+y,y));
 for(const [value,label] of Object.entries(statuses)){
  $('filter').add(new Option(label,value));
  form.elements.status.add(new Option(label,value));
@@ -207,9 +215,9 @@ function node(tag,value,cls){
 function due(record){return !!record.due&&record.due<=today()&&['watch','active'].includes(record.status);}
 function visible(){
  const query=$('search').value.trim().toLocaleLowerCase('th');
- const status=$('filter').value;
+ const status=$('filter').value,year=$('yearFilter').value;
  return records
-  .filter(r=>(!status||r.status===status)&&[r.id,r.name,r.school].some(v=>String(v??'').toLocaleLowerCase('th').includes(query)))
+  .filter(r=>(!status||r.status===status)&&(!year||String(r.year)===year)&&[r.id,r.name,r.school].some(v=>String(v??'').toLocaleLowerCase('th').includes(query)))
   .sort((a,b)=>due(b)-due(a)||String(a.id).localeCompare(String(b.id),'th',{numeric:true}));
 }
 const blank = v => v===''||v==null;
@@ -235,8 +243,11 @@ function render(){
   details.append(node('strong',record.name),node('small',record.id));
   person.append(node('span',[...record.name][0]??'?','avatar'),details);
   td.append(person);tr.append(td);
-  for(const value of [record.school,blank(record.gpa)?'':Number(record.gpa).toFixed(2),blank(record.attendance)?'':record.attendance+'%',record.absence,record.missing])
+  const level=(record.year?'ปี '+record.year:'')+(record.year&&record.term?' · ':'')+(record.term?'เทอม '+record.term:'');
+  const gpa=v=>blank(v)?'':Number(v).toFixed(2);
+  for(const value of [level,record.school,gpa(record.gpa),gpa(record.gpaNow),blank(record.attendance)?'':record.attendance+'%'])
    tr.append(node('td',blank(value)?'—':String(value)));
+  for(const k of ['observe','practice']){const c=node('td');c.append(node('span',stages[record[k]],'pill '+stagePill[record[k]]));tr.append(c);}
   const status=node('td');
   status.append(node('span',statuses[record.status],'pill '+record.status));
   if(record.issue)status.append(node('small',record.issue));
@@ -249,7 +260,7 @@ function render(){
  }));
  if(!shown.length){
   const row=node('tr'),cell=node('td',loading?'กำลังโหลดรายชื่อนักศึกษา…':records.length?'ไม่พบข้อมูลนักศึกษาที่ตรงกับการค้นหา':'ยังไม่มีข้อมูลนักศึกษา · กด “เพิ่มนักศึกษา” หรือ “นำเข้า CSV” เพื่อเริ่มต้น','muted');
-  cell.colSpan=9;row.append(cell);$('rows').append(row);
+  cell.colSpan=11;row.append(cell);$('rows').append(row);
  }
  $('count').textContent='แสดง '+shown.length+' จาก '+records.length+' คน';
  for(const id of ['add','importWrap'])$(id).hidden=!store.canWrite;
@@ -339,11 +350,12 @@ $('add').onclick=()=>open();
 $('close').onclick=()=>$('editor').close();
 $('search').oninput=render;
 $('filter').onchange=render;
+$('yearFilter').onchange=render;
 
 /* ---------- CSV ---------- */
 function csvText(){
  const quote=value=>{const s=String(value??'');return '"'+(/^[=+@\-\r\n\t]/.test(s)?"'":'')+s.replaceAll('"','""')+'"';};
- const lines=[Object.values(FIELDS),...visible().map(r=>Object.keys(FIELDS).map(f=>f==='status'?statuses[r.status]:r[f]))];
+ const lines=[Object.values(FIELDS),...visible().map(r=>Object.keys(FIELDS).map(f=>f==='status'?statuses[r.status]:f==='observe'||f==='practice'?stages[r[f]]:r[f]))];
  return '﻿'+lines.map(row=>row.map(quote).join(',')).join('\r\n');
 }
 $('export').onclick=async()=>{
@@ -374,8 +386,9 @@ function parseCSV(text){
  return rows.filter(r=>r.some(v=>v.trim()));
 }
 const unguard = v => String(v).replace(/^'(?=[=+@\-\t\r\n])/,'');
-const headerMap = Object.fromEntries(Object.entries(FIELDS).flatMap(([k,label])=>[[k.toLowerCase(),k],[label,k]]).concat([['ผู้รับผิดชอบติดตาม','advisor'],['ประเด็นที่ติดตาม','issue'],['ชื่อ-นามสกุล','name'],['ขาดเรียน (ครั้ง)','absence'],['งานค้าง (ชิ้น)','missing']]));
+const headerMap = Object.fromEntries(Object.entries(FIELDS).flatMap(([k,label])=>[[k.toLowerCase(),k],[label,k]]).concat([['ผู้รับผิดชอบติดตาม','advisor'],['ปี','year'],['ชั้นปีที่','year'],['ภาคเรียน','term'],['เกรดเฉลี่ย','gpaNow'],['GPA','gpaNow'],['gpax','gpaNow'],['ประเด็นที่ติดตาม','issue'],['ชื่อ-นามสกุล','name']]));
 const statusMap = Object.fromEntries(Object.entries(statuses).flatMap(([k,label])=>[[k,k],[label,k]]));
+const stageMap = Object.fromEntries(Object.entries(stages).flatMap(([k,label])=>[[k,k],[label,k]]));
 $('import').onchange=async event=>{
  const file=event.target.files[0];event.target.value='';
  if(!file)return;
@@ -388,14 +401,16 @@ $('import').onchange=async event=>{
  for(const row of rows.slice(1)){
   const raw={};
   cols.forEach((k,i)=>{if(k&&row[i]!=null)raw[k]=unguard(row[i]).trim();});
-  if(raw.status!=null)raw.status=statusMap[raw.status]??statusMap[raw.status.toLowerCase()]??'normal';
+  if(raw.status)raw.status=statusMap[raw.status]??statusMap[raw.status.toLowerCase()]??'normal';
+  for(const k of ['observe','practice'])if(raw[k])raw[k]=stageMap[raw[k]]??stageMap[raw[k].toLowerCase()]??'none';
+  for(const k of ['year','term'])if(raw[k])raw[k]=raw[k].replace(/^(ปี|ชั้นปีที่|เทอม|ภาคเรียนที่)\s*/,'');
   const rec=clean(raw);
   if(!rec.id||!rec.name||seen.has(rec.id)){skipped++;continue;}
   seen.add(rec.id);
   const prev=byId.get(rec.id);
   if(prev){ // keep what the file does not mention, and always keep the follow-up history
    const merged={...prev};
-   for(const k of Object.keys(raw))if(k in FIELDS)merged[k]=rec[k];
+   for(const k of Object.keys(raw))if(k in FIELDS&&raw[k]!=='')merged[k]=rec[k]; // blank cell = keep current value
    pairs.push([prev,{...merged,notes:prev.notes,demo:false}]);
   }else pairs.push([null,rec]);
  }
