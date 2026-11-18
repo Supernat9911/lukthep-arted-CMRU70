@@ -149,6 +149,7 @@ a{color:var(--accent)}
 #toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));right:calc(20px + env(safe-area-inset-right,0px));background:var(--toast);color:var(--toast-ink);padding:12px 18px;border-radius:10px;z-index:10;max-width:calc(100vw - 40px)}
 @media(max-width:650px){.stats{grid-template-columns:repeat(2,1fr)}main{padding-top:24px}.toolbar{align-items:flex-start}.filters,.filters input{width:100%}.mode{margin-left:0}.fields{grid-template-columns:1fr;gap:8px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+img.avatar{object-fit:cover}.photo-preview{width:72px;height:72px;border-radius:12px;object-fit:cover}.photo-field{align-items:end}.photo-field label{flex:1;min-width:180px}
 </style>
 <div class="demo-bar" id="demoBar" hidden>โหมดทดลอง · ข้อมูลในหน้านี้ไม่ถูกบันทึก และไม่กระทบข้อมูลจริง · <a href="./">ออกจากโหมดทดลอง</a></div>
 <header><div class="wrap"><div class="logo" aria-hidden="true">ศ</div><div><div class="brand">ลูกเทพศิลปศึกษา</div><div class="muted">สาขาศิลปศึกษา มหาวิทยาลัยราชภัฏเชียงใหม่</div></div><div class="mode"><small id="mode">ข้อมูลบันทึกในเบราว์เซอร์นี้</small><a id="guideLink" href="guide.html" hidden>คู่มือ</a>
@@ -164,6 +165,7 @@ a{color:var(--accent)}
 <dialog id="editor" aria-labelledby="dialogTitle"><div class="row between"><h2 id="dialogTitle"></h2><button id="close" aria-label="ปิด" type="button" class="ghost">✕</button></div><form id="form"><div class="fields">
 <label>รหัสนักศึกษา<input id="f-id" name="id" required maxlength="30"></label><label>ชื่อ–นามสกุล<input id="f-name" name="name" required maxlength="120"></label>
 <label>ชั้นปี<select id="f-year" name="year"><option value="">—</option><option value="1">ปี 1</option><option value="2">ปี 2</option><option value="3">ปี 3</option><option value="4">ปี 4</option></select></label><label>เทอม<select id="f-term" name="term"><option value="">—</option><option value="1">เทอม 1</option><option value="2">เทอม 2</option></select></label>
+<div class="wide row photo-field"><img id="photo-preview" class="photo-preview" alt="ตัวอย่างรูปนักศึกษา" hidden><label>รูปนักศึกษา<input id="photo-input" type="file" accept="image/jpeg,image/png,image/webp" aria-describedby="photo-help"><small id="photo-help">JPG, PNG หรือ WebP สูงสุด 5 MB · บันทึกเป็น 256 × 256 พิกเซล</small></label><button id="photo-remove" type="button" hidden>นำรูปออก</button></div>
 <label>โรงเรียนที่จบมา<input id="f-school" name="school" maxlength="150"></label><label>เกรดเฉลี่ยเดิม<input id="f-gpa" name="gpa" type="number" min="0" max="4" step="0.01"></label>
 <label>เกรดเฉลี่ยปัจจุบัน<input id="f-gpaNow" name="gpaNow" type="number" min="0" max="4" step="0.01"></label><label>เข้าเรียน (%)<input id="f-attendance" name="attendance" type="number" min="0" max="100"></label>
 <label>คะแนนภาษาอังกฤษ (0–100)<input id="f-englishScore" name="englishScore" type="number" min="0" max="100" step="0.5"></label><label>ระดับภาษาอังกฤษ (CEFR)<select id="f-englishLevel" name="englishLevel"><option value="">—</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select></label>
@@ -249,7 +251,7 @@ function isoDate(v){
 }
 function clean(r){
  r=r&&typeof r==='object'?r:{};
- return {id:str(r.id,30),name:str(r.name,120),school:str(r.school,150),gpa:num(r.gpa,0,4),gpaNow:num(r.gpaNow,0,4),englishScore:num(r.englishScore,0,100),englishLevel:CEFR.includes(str(r.englishLevel).toUpperCase())?str(r.englishLevel).toUpperCase():'',attendance:num(r.attendance,0,100),
+ return {photo:typeof r.photo==='string'&&r.photo.length<=45000&&/^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(r.photo)?r.photo:'',id:str(r.id,30),name:str(r.name,120),school:str(r.school,150),gpa:num(r.gpa,0,4),gpaNow:num(r.gpaNow,0,4),englishScore:num(r.englishScore,0,100),englishLevel:CEFR.includes(str(r.englishLevel).toUpperCase())?str(r.englishLevel).toUpperCase():'',attendance:num(r.attendance,0,100),
   year:[1,2,3,4].includes(+r.year)?+r.year:'',term:[1,2].includes(+r.term)?+r.term:'',observe:stages[r.observe]?r.observe:'none',practice:stages[r.practice]?r.practice:'none',status:statuses[r.status]?r.status:'normal',due:isoDate(r.due),
   issue:str(r.issue,200),contact:str(r.contact,150),advisor:str(r.advisor,120),
   notes:Array.isArray(r.notes)?r.notes.filter(n=>n&&typeof n.text==='string'&&n.at).map(n=>({at:String(n.at),text:n.text.slice(0,2000),...(n.by?{by:String(n.by)}:{}),...(n.byName?{byName:String(n.byName)}:{})})):[],
@@ -303,6 +305,7 @@ const store = {
   for(const r of list) await this.db.collection('students').doc(r._doc).delete();
  },
  async many(pairs){ // [[prev|null,next],...]
+  pairs=pairs.map(([prev,next])=>[prev,{...next,photo:prev?.photo??next.photo}]);
   if(this.mode==='sheets'){fromServer(await api('importStudents',{rows:pairs.map(([prev,rec])=>({prevId:prev?.id??null,student:forServer(rec)}))}));return;}
   if(this.mode==='local'){
    let next=[...records];
@@ -321,6 +324,68 @@ let records = inViewer||useSheets ? [] : local.load();
 let loading = inViewer||useSheets, loadProblem = '';
 let editing = null, timer;
 const form = $('form');
+let photo='';
+let photoRequest=0;
+const photoInput=$('photo-input');
+const photoSubmit=$('submit');
+function updatePhotoPreview(){
+ const preview=$('photo-preview');
+ preview.hidden=!photo;
+ $('photo-remove').hidden=!photo;
+ if(photo)preview.src=photo;
+ else preview.removeAttribute('src');
+}
+photoInput.addEventListener('change',async ()=>{
+ const request=++photoRequest;
+ const file=photoInput.files[0];
+ $('error').textContent='';
+ photoSubmit.disabled=Boolean(file);
+ if(!file)return;
+ try {
+  if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>5_000_000){
+   throw new Error('กรุณาเลือกไฟล์ JPG, PNG หรือ WebP ขนาดไม่เกิน 5 MB');
+  }
+  const url=URL.createObjectURL(file);
+  try {
+   const image=new Image();
+   image.src=url;
+   await image.decode();
+   if(request!==photoRequest)return;
+   const canvas=document.createElement('canvas');
+   canvas.width=canvas.height=256;
+   const side=Math.min(image.naturalWidth,image.naturalHeight);
+   const ctx=canvas.getContext('2d');
+   ctx.fillStyle='#ffffff';
+   ctx.fillRect(0,0,256,256);
+   ctx.drawImage(image,(image.naturalWidth-side)/2,(image.naturalHeight-side)/2,side,side,0,0,256,256);
+   let encoded=canvas.toDataURL('image/jpeg',0.8);
+   if(encoded.length>45000)encoded=canvas.toDataURL('image/jpeg',0.5);
+   if(encoded.length>45000)encoded=canvas.toDataURL('image/jpeg',0.3);
+   if(encoded.length>45000)throw new Error();
+   photo=encoded;
+   updatePhotoPreview();
+  }catch{
+   throw new Error('เปิดรูปนี้ไม่ได้ กรุณาเลือกไฟล์รูปอื่น');
+  }finally{
+   URL.revokeObjectURL(url);
+  }
+ }catch(error){
+  if(request!==photoRequest)return;
+  $('error').textContent=error.message;
+  photoInput.value='';
+ }finally{
+  if(request===photoRequest)photoSubmit.disabled=false;
+ }
+});
+$('photo-remove').onclick=()=>{
+ ++photoRequest;
+ photo='';
+ photoInput.value='';
+ photoSubmit.disabled=false;
+ $('error').textContent='';
+ updatePhotoPreview();
+};
+
 for(const [value,label] of Object.entries(stages)){form.elements.observe.add(new Option(label,value));form.elements.practice.add(new Option(label,value));}
 for(const y of [1,2,3,4])$('yearFilter').add(new Option('ปี '+y,y));
 for(const [value,label] of Object.entries(statuses)){
@@ -365,7 +430,10 @@ function render(){
   const td=node('td'),person=node('div',undefined,'person'),details=node('div');
   details.append(node('strong',record.name));
   tr.append(node('td',record.id,'sid'));
-  person.append(node('span',[...record.name.replace(/^(นาย|นางสาว|นาง|น\.ส\.|ด\.ช\.|ด\.ญ\.)\s*/,'')][0]??'?','avatar'),details);
+  const fallback=node('span',[...record.name.replace(/^(นาย|นางสาว|นาง|น\.ส\.|ด\.ช\.|ด\.ญ\.)\s*/,'')][0]??'?','avatar');
+  const avatar=record.photo?node('img',undefined,'avatar'):fallback;
+  if(record.photo){avatar.src=record.photo;avatar.alt='';avatar.loading='lazy';}
+  person.append(avatar,details);
   td.append(person);tr.append(td);
   const level=(record.year?'ปี '+record.year:'')+(record.year&&record.term?' · ':'')+(record.term?'เทอม '+record.term:'');
   const gpa=v=>blank(v)?'':Number(v).toFixed(2);
@@ -418,6 +486,12 @@ function ask(message,yes,danger){
 async function open(record){
  editing=record??null;
  form.reset();
+ ++photoRequest;
+ photo=record?.photo??'';
+ photoSubmit.disabled=false;
+ photoInput.disabled=!store.canWrite;
+ $('photo-remove').disabled=!store.canWrite;
+ updatePhotoPreview();
  $('error').textContent='';
  $('dialogTitle').textContent=record?'ประวัตินักศึกษา':'เพิ่มนักศึกษา';
  $('remove').hidden=!record||!store.canWrite;
@@ -464,7 +538,7 @@ function writeFailed(e){
 /* ---------- actions ---------- */
 form.addEventListener('submit',async event=>{
  event.preventDefault();
- if(!store.canWrite)return;
+ if(!store.canWrite||photoSubmit.disabled)return;
  const values=Object.fromEntries([...new FormData(form)].map(([f,v])=>[f,String(v).trim()]));
  if(!values.id||!values.name){$('error').textContent='กรุณาระบุรหัสและชื่อนักศึกษา';return;}
  if(records.some(r=>r!==editing&&r.id===values.id)){$('error').textContent='รหัสนักศึกษานี้มีอยู่แล้ว';return;}
@@ -472,7 +546,7 @@ form.addEventListener('submit',async event=>{
  $('submit').disabled=true;
  try{
   const entry=note?{at:new Date().toISOString(),text:note,...(store.me?{by:store.me}:{})}:null;
-  const next={...clean({...fields,notes:editing?.notes??[],demo:editing?.demo??false}),...(editing?._doc?{_doc:editing._doc}:{})};
+  const next={...clean({...fields,photo,notes:editing?.notes??[],demo:editing?.demo??false}),...(editing?._doc?{_doc:editing._doc}:{})};
   await store.upsert(editing,next,entry);
   $('editor').close();toast('บันทึกข้อมูลแล้ว');
  }catch(e){$('error').textContent=writeFailed(e);}

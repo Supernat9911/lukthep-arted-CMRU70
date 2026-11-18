@@ -26,7 +26,7 @@ var SHEETS = {
     ['status', 'สถานะติดตาม'], ['due', 'นัดติดตามครั้งถัดไป'], ['contact', 'ช่องทางติดต่อ'],
     ['advisor', 'ผู้รับผิดชอบ'], ['issue', 'ประเด็นติดตาม'], ['demo', 'ข้อมูลตัวอย่าง'],
     ['updatedAt', 'แก้ไขล่าสุด'], ['updatedBy', 'แก้ไขโดย'],
-    ['englishScore', 'คะแนนภาษาอังกฤษ'], ['englishLevel', 'ระดับภาษาอังกฤษ (CEFR)']] }, // คอลัมน์ใหม่ต่อท้ายเสมอ ข้อมูลเดิมไม่เลื่อน
+    ['englishScore', 'คะแนนภาษาอังกฤษ'], ['englishLevel', 'ระดับภาษาอังกฤษ (CEFR)'], ['photo', 'รูปนักศึกษา']] }, // คอลัมน์ใหม่ต่อท้ายเสมอ ข้อมูลเดิมไม่เลื่อน
   notes: { name: 'บันทึกติดตาม', cols: [
     ['studentId', 'รหัสนักศึกษา'], ['at', 'เวลา'], ['text', 'บันทึก'], ['byName', 'ผู้บันทึก']] },
   users: { name: 'ผู้ใช้', cols: [
@@ -332,6 +332,7 @@ function saveStudent_(s, p) {
   if (prevId && i < 0) throw fail_('not_found', 'ไม่พบนักศึกษาคนนี้ อาจถูกลบไปแล้ว โปรดกดรีเฟรช');
   var now = new Date().toISOString();
   st.updatedAt = now; st.updatedBy = s.name;
+  if (i >= 0 && p.student.photo === undefined) st.photo = rows[i].photo;
   if (i >= 0) rows[i] = st; else rows.push(st);
   writeTable_('students', rows.map(toSheet_));
   if (prevId && prevId !== st.id) {
@@ -366,7 +367,10 @@ function importStudents_(s, list) {
     if (!st.id || !st.name) return;
     if (Array.isArray(item.student.enroll)) enrollMap[st.id] = item.student.enroll;
     st.updatedAt = now; st.updatedBy = s.name;
-    if (index[st.id] != null) rows[index[st.id]] = st;
+    if (index[st.id] != null) {
+      st.photo = rows[index[st.id]].photo;
+      rows[index[st.id]] = st;
+    }
     else { index[st.id] = rows.length; rows.push(st); }
   });
   writeTable_('students', rows.map(toSheet_));
@@ -374,7 +378,9 @@ function importStudents_(s, list) {
 }
 
 function cleanStudent_(r) {
+  var photo = typeof r.photo === 'string' ? r.photo : '';
   return {
+    photo: photo.length <= 45000 && /^data:image\/jpeg;base64,[A-Za-z0-9+/]+={0,2}$/.test(photo) ? photo : '',
     id: str_(r.id, 30), name: str_(r.name, 120),
     year: [1, 2, 3, 4].indexOf(Number(r.year)) >= 0 ? Number(r.year) : '',
     term: [1, 2].indexOf(Number(r.term)) >= 0 ? Number(r.term) : '',
