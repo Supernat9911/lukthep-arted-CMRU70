@@ -6,7 +6,8 @@
  * ทุกคำตอบเป็น JSON {ok: true, ...} หรือ {ok: false, code, message}
  */
 
-var APP_VERSION = '1.1.0';
+var APP_VERSION = '1.2.0';
+var CEFR = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 /** Client ID ของ Google Sign-In (ค่าเดียวกับในหน้าเว็บ) ว่างไว้ = ปิดการเข้าสู่ระบบด้วย Google */
 var GOOGLE_CLIENT_ID = '';
 var SESSION_SECONDS = 6 * 60 * 60;   // อยู่ในระบบได้ 6 ชั่วโมง (สูงสุดของ CacheService)
@@ -24,7 +25,8 @@ var SHEETS = {
     ['attendance', 'เข้าเรียน (%)'], ['observe', 'สังเกตการสอน'], ['practice', 'ทดลองสอน'],
     ['status', 'สถานะติดตาม'], ['due', 'นัดติดตามครั้งถัดไป'], ['contact', 'ช่องทางติดต่อ'],
     ['advisor', 'ผู้รับผิดชอบ'], ['issue', 'ประเด็นติดตาม'], ['demo', 'ข้อมูลตัวอย่าง'],
-    ['updatedAt', 'แก้ไขล่าสุด'], ['updatedBy', 'แก้ไขโดย']] },
+    ['updatedAt', 'แก้ไขล่าสุด'], ['updatedBy', 'แก้ไขโดย'],
+    ['englishScore', 'คะแนนภาษาอังกฤษ'], ['englishLevel', 'ระดับภาษาอังกฤษ (CEFR)']] }, // คอลัมน์ใหม่ต่อท้ายเสมอ ข้อมูลเดิมไม่เลื่อน
   notes: { name: 'บันทึกติดตาม', cols: [
     ['studentId', 'รหัสนักศึกษา'], ['at', 'เวลา'], ['text', 'บันทึก'], ['byName', 'ผู้บันทึก']] },
   users: { name: 'ผู้ใช้', cols: [
@@ -254,6 +256,8 @@ function cleanStudent_(r) {
     year: [1, 2, 3, 4].indexOf(Number(r.year)) >= 0 ? Number(r.year) : '',
     term: [1, 2].indexOf(Number(r.term)) >= 0 ? Number(r.term) : '',
     school: str_(r.school, 150), gpa: num_(r.gpa, 0, 4), gpaNow: num_(r.gpaNow, 0, 4),
+    englishScore: num_(r.englishScore, 0, 100),
+    englishLevel: CEFR.indexOf(str_(r.englishLevel, 2).toUpperCase()) >= 0 ? str_(r.englishLevel, 2).toUpperCase() : '',
     attendance: num_(r.attendance, 0, 100),
     observe: keyOf_(STAGE, r.observe, 'none'), practice: keyOf_(STAGE, r.practice, 'none'),
     status: keyOf_(STATUS, r.status, 'normal'),
@@ -296,6 +300,10 @@ function sheet_(key) {
       .setValues([def.cols.map(function (c) { return c[1]; })])
       .setFontWeight('bold');
     sh.setFrozenRows(1);
+  } else if (sh.getLastColumn() < def.cols.length) { // อัปเดตจากเวอร์ชันเก่า: เติมหัวคอลัมน์ใหม่
+    var from = sh.getLastColumn() + 1, extra = def.cols.slice(from - 1);
+    sh.getRange(1, from, sh.getMaxRows(), extra.length).setNumberFormat('@');
+    sh.getRange(1, from, 1, extra.length).setValues([extra.map(function (c) { return c[1]; })]).setFontWeight('bold');
   }
   return sh;
 }

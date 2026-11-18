@@ -13,6 +13,7 @@
  --accent:#6a55d6;--accent-ink:#ffffff;--soft:#ece8ff;--soft-line:#d6cdfb;--soft-ink:#43319f;
  --ok:#137353;--ok-bg:#dcf4e9;--warn:#8f520c;--warn-bg:#fcecd5;--crit:#a8244b;--crit-bg:#fbe3ea;
  --done:#4b39b0;--done-bg:#ebe6ff;--toast:#2b2545;--toast-ink:#ffffff;--shade:rgb(28 26 46/.45);
+ --bulb:#f2b632;--bulb-glow:rgb(242 182 50/.28);
  --font:'IBM Plex Sans Thai',system-ui,-apple-system,'Segoe UI',sans-serif;
  --display:'Anuphan','IBM Plex Sans Thai',system-ui,sans-serif;
 }
@@ -67,7 +68,7 @@ button.ghost{background:transparent;border-color:transparent;padding:6px 9px}
 .filebtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
 .filebtn{position:relative;display:inline-block}
 .table{overflow-x:auto}
-table{width:100%;min-width:1180px;border-collapse:collapse;text-align:left}
+table{width:100%;min-width:1280px;border-collapse:collapse;text-align:left}
 th,td{padding:12px;border-top:1px solid var(--line);vertical-align:middle}
 th:first-child,td:first-child{padding-left:18px}
 th{color:var(--muted);background:var(--panel-2);font-size:12px;white-space:nowrap}
@@ -103,6 +104,23 @@ label input,label select,label textarea{width:100%;min-width:0}
 .links{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:22px}
 a{color:var(--accent)}
 .linkbtn{background:none;border:0;padding:0;color:var(--accent);text-decoration:underline;font-weight:500}
+.themectl{display:flex;align-items:center;gap:8px;padding:3px 4px 3px 3px;border:1px solid var(--line);border-radius:999px;background:var(--panel)}
+.iconbtn{display:grid;place-items:center;width:34px;height:34px;padding:0;border-radius:50%;border:0;background:transparent;color:var(--muted)}
+.iconbtn:hover{background:var(--panel-2)}
+.iconbtn .glass{fill:none}
+.iconbtn .rays{opacity:0}
+.iconbtn[aria-pressed="true"]{color:var(--bulb);background:var(--bulb-glow)}
+.iconbtn[aria-pressed="true"] .glass{fill:var(--bulb)}
+.iconbtn[aria-pressed="true"] .rays{opacity:1}
+.switch{display:flex;align-items:center;gap:7px;border:0;background:transparent;padding:4px 6px;font-size:13px;font-weight:500;color:var(--muted)}
+.switch .track{position:relative;width:32px;height:18px;border-radius:999px;background:var(--field-line);transition:background .15s}
+.switch .knob{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--panel);transition:transform .15s}
+.switch[aria-checked="true"]{color:var(--ink)}
+.switch[aria-checked="true"] .track{background:var(--accent)}
+.switch[aria-checked="true"] .knob{transform:translateX(14px)}
+.whobox{display:flex;align-items:center;gap:7px;font-size:13px;padding:5px 11px;border-radius:999px;background:var(--ok-bg);color:var(--ok);font-weight:500}
+.whobox.off{background:var(--panel-2);color:var(--muted)}
+.whobox .dot{width:8px;height:8px;border-radius:50%;background:currentColor}
 .demo-bar{background:var(--warn-bg);color:var(--warn);text-align:center;padding:8px 16px;font-weight:600}
 .demo-bar a{color:inherit}
 #confirmText{margin:12px 0 18px;white-space:pre-wrap}
@@ -111,17 +129,21 @@ a{color:var(--accent)}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 <div class="demo-bar" id="demoBar" hidden>โหมดทดลอง · ข้อมูลในหน้านี้ไม่ถูกบันทึก และไม่กระทบข้อมูลจริง · <a href="./">ออกจากโหมดทดลอง</a></div>
-<header><div class="wrap"><div class="logo" aria-hidden="true">ศ</div><div><div class="brand">ลูกเทพศิลปศึกษา</div><div class="muted">สาขาศิลปศึกษา มหาวิทยาลัยราชภัฏเชียงใหม่</div></div><div class="mode"><small id="mode">ข้อมูลบันทึกในเบราว์เซอร์นี้</small><button id="refresh" class="ghost" type="button" hidden>รีเฟรช</button><small id="who" hidden></small><button id="logout" class="ghost" type="button" hidden>ออกจากระบบ</button><a id="guideLink" href="guide.html" hidden>คู่มือ</a><button id="theme" class="ghost" type="button" hidden></button></div></div></header>
+<header><div class="wrap"><div class="logo" aria-hidden="true">ศ</div><div><div class="brand">ลูกเทพศิลปศึกษา</div><div class="muted">สาขาศิลปศึกษา มหาวิทยาลัยราชภัฏเชียงใหม่</div></div><div class="mode"><small id="mode">ข้อมูลบันทึกในเบราว์เซอร์นี้</small><a id="guideLink" href="guide.html" hidden>คู่มือ</a>
+<span class="whobox" id="whoBox" hidden><span class="dot" aria-hidden="true"></span><span id="who"></span></span>
+<button id="loginOpen" class="ghost" type="button" hidden>เข้าสู่ระบบ</button><button id="refresh" class="ghost" type="button" hidden>รีเฟรช</button><button id="logout" class="ghost" type="button" hidden>ออกจากระบบ</button>
+<div class="themectl"><button id="bulb" class="iconbtn" type="button" aria-pressed="false" aria-label="สลับโหมดสว่าง/มืด"><svg viewBox="-2 -2 28 28" width="22" height="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="glass" d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2v.7h5.2v-.7c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/><path d="M9.6 19h4.8M10.4 21.6h3.2" fill="none"/><g class="rays" fill="none"><path d="M12 -1.2v1.6M3.2 9.6H1.6M22.4 9.6h-1.6M5 2.6l1.1 1.1M19 2.6l-1.1 1.1"/></g></svg></button><button id="auto" class="switch" type="button" role="switch" aria-checked="true"><span class="track" aria-hidden="true"><span class="knob"></span></span>อัตโนมัติ</button></div></div></div></header>
 <main class="wrap"><div class="row intro"><div><h1>ภาพรวมการติดตามนักศึกษา</h1><p class="muted">นักศึกษา · ประวัติการศึกษา · การเข้าเรียน · นัดหมายติดตาม</p></div><div class="row"><label class="filebtn" id="importWrap">นำเข้า CSV<input id="import" type="file" accept=".csv,text/csv"></label><button id="export" type="button">ดาวน์โหลด CSV</button><button id="add" class="primary" type="button">＋ เพิ่มนักศึกษา</button></div></div>
 <div class="notice" id="notice"><span id="alert">กำลังโหลดข้อมูล…</span><button id="clearDemo" class="ghost" type="button" hidden>ลบข้อมูลตัวอย่าง</button></div>
 <section class="stats" aria-label="สรุปการติดตาม" id="stats"></section>
 <section class="panel"><div class="toolbar"><h2>รายชื่อนักศึกษา</h2><div class="filters"><input id="search" type="search" placeholder="ค้นหาชื่อ รหัส หรือโรงเรียน" aria-label="ค้นหาชื่อ รหัส หรือโรงเรียน"><select id="yearFilter" aria-label="กรองชั้นปี"><option value="">ทุกชั้นปี</option></select><select id="filter" aria-label="กรองสถานะ"><option value="">ทุกสถานะ</option></select></div></div>
-<div class="table"><table><thead><tr><th>นักศึกษา</th><th>ชั้นปี / เทอม</th><th>โรงเรียนที่จบมา</th><th>เกรดเฉลี่ยเดิม</th><th>เกรดเฉลี่ยปัจจุบัน</th><th>เข้าเรียน</th><th>สังเกตการสอน</th><th>ทดลองสอน</th><th>สถานะติดตาม</th><th>นัดครั้งถัดไป</th><th>จัดการ</th></tr></thead><tbody id="rows"></tbody></table></div><div id="count" class="foot muted"></div></section></main>
+<div class="table"><table><thead><tr><th>นักศึกษา</th><th>ชั้นปี / เทอม</th><th>โรงเรียนที่จบมา</th><th>เกรดเฉลี่ยเดิม</th><th>เกรดเฉลี่ยปัจจุบัน</th><th>ภาษาอังกฤษ</th><th>เข้าเรียน</th><th>สังเกตการสอน</th><th>ทดลองสอน</th><th>สถานะติดตาม</th><th>นัดครั้งถัดไป</th><th>จัดการ</th></tr></thead><tbody id="rows"></tbody></table></div><div id="count" class="foot muted"></div></section></main>
 <dialog id="editor" aria-labelledby="dialogTitle"><div class="row between"><h2 id="dialogTitle"></h2><button id="close" aria-label="ปิด" type="button" class="ghost">✕</button></div><form id="form"><div class="fields">
 <label>รหัสนักศึกษา<input id="f-id" name="id" required maxlength="30"></label><label>ชื่อ–นามสกุล<input id="f-name" name="name" required maxlength="120"></label>
 <label>ชั้นปี<select id="f-year" name="year"><option value="">—</option><option value="1">ปี 1</option><option value="2">ปี 2</option><option value="3">ปี 3</option><option value="4">ปี 4</option></select></label><label>เทอม<select id="f-term" name="term"><option value="">—</option><option value="1">เทอม 1</option><option value="2">เทอม 2</option></select></label>
 <label>โรงเรียนที่จบมา<input id="f-school" name="school" maxlength="150"></label><label>เกรดเฉลี่ยเดิม<input id="f-gpa" name="gpa" type="number" min="0" max="4" step="0.01"></label>
 <label>เกรดเฉลี่ยปัจจุบัน<input id="f-gpaNow" name="gpaNow" type="number" min="0" max="4" step="0.01"></label><label>เข้าเรียน (%)<input id="f-attendance" name="attendance" type="number" min="0" max="100"></label>
+<label>คะแนนภาษาอังกฤษ (0–100)<input id="f-englishScore" name="englishScore" type="number" min="0" max="100" step="0.5"></label><label>ระดับภาษาอังกฤษ (CEFR)<select id="f-englishLevel" name="englishLevel"><option value="">—</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select></label>
 <label>สังเกตการสอน<select id="f-observe" name="observe"></select></label><label>ทดลองสอน<select id="f-practice" name="practice"></select></label>
 <label>ช่องทางติดต่อ<input id="f-contact" name="contact" maxlength="150"></label><label>ผู้รับผิดชอบติดตาม<input id="f-advisor" name="advisor" maxlength="120"></label>
 <label>สถานะติดตาม<select id="f-status" name="status"></select></label><label>นัดติดตามครั้งถัดไป<input id="f-due" name="due" type="date"></label>
@@ -147,7 +169,8 @@ const $ = id => document.getElementById(id);
 const statuses = {normal:'ปกติ',watch:'เฝ้าระวัง',active:'กำลังติดตาม',done:'ติดตามแล้ว'};
 const stages = {none:'ยังไม่เริ่ม',doing:'กำลังดำเนินการ',pass:'ผ่าน',fail:'ไม่ผ่าน'};
 const stagePill = {none:'none',doing:'watch',pass:'normal',fail:'active'};
-const FIELDS = {id:'รหัสนักศึกษา',name:'ชื่อ–นามสกุล',year:'ชั้นปี',term:'เทอม',school:'โรงเรียนที่จบมา',gpa:'เกรดเฉลี่ยเดิม',gpaNow:'เกรดเฉลี่ยปัจจุบัน',attendance:'เข้าเรียน (%)',observe:'สังเกตการสอน',practice:'ทดลองสอน',status:'สถานะติดตาม',due:'นัดติดตามครั้งถัดไป',contact:'ช่องทางติดต่อ',advisor:'ผู้รับผิดชอบ',issue:'ประเด็นติดตาม'};
+const CEFR = ['A1','A2','B1','B2','C1','C2'];
+const FIELDS = {id:'รหัสนักศึกษา',name:'ชื่อ–นามสกุล',year:'ชั้นปี',term:'เทอม',school:'โรงเรียนที่จบมา',gpa:'เกรดเฉลี่ยเดิม',gpaNow:'เกรดเฉลี่ยปัจจุบัน',englishScore:'คะแนนภาษาอังกฤษ',englishLevel:'ระดับภาษาอังกฤษ (CEFR)',attendance:'เข้าเรียน (%)',observe:'สังเกตการสอน',practice:'ทดลองสอน',status:'สถานะติดตาม',due:'นัดติดตามครั้งถัดไป',contact:'ช่องทางติดต่อ',advisor:'ผู้รับผิดชอบ',issue:'ประเด็นติดตาม'};
 const TZ = 'Asia/Bangkok';
 const today = () => new Intl.DateTimeFormat('en-CA',{timeZone:TZ}).format(new Date());
 const date = value => value ? new Intl.DateTimeFormat('th-TH',{dateStyle:'medium',timeZone:TZ}).format(new Date(value)) : '—';
@@ -177,7 +200,7 @@ function isoDate(v){
 }
 function clean(r){
  r=r&&typeof r==='object'?r:{};
- return {id:str(r.id,30),name:str(r.name,120),school:str(r.school,150),gpa:num(r.gpa,0,4),gpaNow:num(r.gpaNow,0,4),attendance:num(r.attendance,0,100),
+ return {id:str(r.id,30),name:str(r.name,120),school:str(r.school,150),gpa:num(r.gpa,0,4),gpaNow:num(r.gpaNow,0,4),englishScore:num(r.englishScore,0,100),englishLevel:CEFR.includes(str(r.englishLevel).toUpperCase())?str(r.englishLevel).toUpperCase():'',attendance:num(r.attendance,0,100),
   year:[1,2,3,4].includes(+r.year)?+r.year:'',term:[1,2].includes(+r.term)?+r.term:'',observe:stages[r.observe]?r.observe:'none',practice:stages[r.practice]?r.practice:'none',status:statuses[r.status]?r.status:'normal',due:isoDate(r.due),
   issue:str(r.issue,200),contact:str(r.contact,150),advisor:str(r.advisor,120),
   notes:Array.isArray(r.notes)?r.notes.filter(n=>n&&typeof n.text==='string'&&n.at).map(n=>({at:String(n.at),text:n.text.slice(0,2000),...(n.by?{by:String(n.by)}:{}),...(n.byName?{byName:String(n.byName)}:{})})):[],
@@ -295,7 +318,8 @@ function render(){
   td.append(person);tr.append(td);
   const level=(record.year?'ปี '+record.year:'')+(record.year&&record.term?' · ':'')+(record.term?'เทอม '+record.term:'');
   const gpa=v=>blank(v)?'':Number(v).toFixed(2);
-  for(const value of [level,record.school,gpa(record.gpa),gpa(record.gpaNow),blank(record.attendance)?'':record.attendance+'%'])
+  const eng=[record.englishLevel,blank(record.englishScore)?'':record.englishScore+' คะแนน'].filter(Boolean).join(' · ');
+  for(const value of [level,record.school,gpa(record.gpa),gpa(record.gpaNow),eng,blank(record.attendance)?'':record.attendance+'%'])
    tr.append(node('td',blank(value)?'—':String(value)));
   for(const k of ['observe','practice']){const c=node('td');c.append(node('span',stages[record[k]],'pill '+stagePill[record[k]]));tr.append(c);}
   const status=node('td');
@@ -310,7 +334,7 @@ function render(){
  }));
  if(!shown.length){
   const row=node('tr'),cell=node('td',loading?'กำลังโหลดรายชื่อนักศึกษา…':records.length?'ไม่พบข้อมูลนักศึกษาที่ตรงกับการค้นหา':'ยังไม่มีข้อมูลนักศึกษา · กด “เพิ่มนักศึกษา” หรือ “นำเข้า CSV” เพื่อเริ่มต้น','muted');
-  cell.colSpan=11;row.append(cell);$('rows').append(row);
+  cell.colSpan=12;row.append(cell);$('rows').append(row);
  }
  $('count').textContent='แสดง '+shown.length+' จาก '+records.length+' คน';
  for(const id of ['add','importWrap'])$(id).hidden=!store.canWrite;
@@ -440,7 +464,7 @@ function parseCSV(text){
  return rows.filter(r=>r.some(v=>v.trim()));
 }
 const unguard = v => String(v).replace(/^'(?=[=+@\-\t\r\n])/,'');
-const headerMap = Object.fromEntries(Object.entries(FIELDS).flatMap(([k,label])=>[[k.toLowerCase(),k],[label,k]]).concat([['ผู้รับผิดชอบติดตาม','advisor'],['ปี','year'],['ชั้นปีที่','year'],['ภาคเรียน','term'],['เกรดเฉลี่ย','gpaNow'],['GPA','gpaNow'],['gpax','gpaNow'],['ประเด็นที่ติดตาม','issue'],['ชื่อ-นามสกุล','name']]));
+const headerMap = Object.fromEntries(Object.entries(FIELDS).flatMap(([k,label])=>[[k.toLowerCase(),k],[label,k]]).concat([['ผู้รับผิดชอบติดตาม','advisor'],['ปี','year'],['ชั้นปีที่','year'],['ภาคเรียน','term'],['เกรดเฉลี่ย','gpaNow'],['ภาษาอังกฤษ','englishLevel'],['CEFR','englishLevel'],['ระดับภาษาอังกฤษ','englishLevel'],['คะแนนสอบภาษาอังกฤษ','englishScore'],['GPA','gpaNow'],['gpax','gpaNow'],['ประเด็นที่ติดตาม','issue'],['ชื่อ-นามสกุล','name']]));
 const statusMap = Object.fromEntries(Object.entries(statuses).flatMap(([k,label])=>[[k,k],[label,k]]));
 const stageMap = Object.fromEntries(Object.entries(stages).flatMap(([k,label])=>[[k,k],[label,k]]));
 $('import').onchange=async event=>{
@@ -474,18 +498,25 @@ $('import').onchange=async event=>{
  try{await store.many(pairs);toast('นำเข้าแล้ว '+pairs.length+' คน');}catch(e){toast(writeFailed(e));}
 };
 
-/* ---------- theme (standalone page only; in Claude the app sets the theme) ---------- */
-const themeLabels={auto:'ธีม: ตามระบบ',light:'ธีม: สว่าง',dark:'ธีม: มืด'};
-function applyTheme(t){
- if(t==='auto')delete document.documentElement.dataset.theme;else document.documentElement.dataset.theme=t;
- $('theme').textContent=themeLabels[t];
+/* ---------- theme: lightbulb = light/dark, switch = follow the system ---------- */
+const root=document.documentElement, hostTheme=root.dataset.theme||'', darkQuery=matchMedia('(prefers-color-scheme: dark)');
+let theme='auto';
+try{const t=localStorage.getItem(THEME_KEY);if(['auto','light','dark'].includes(t))theme=t;}catch{}
+const effectiveTheme=()=>theme!=='auto'?theme:(hostTheme||(darkQuery.matches?'dark':'light'));
+function applyTheme(){
+ if(theme==='auto'){if(hostTheme)root.dataset.theme=hostTheme;else delete root.dataset.theme;}
+ else root.dataset.theme=theme;
+ const light=effectiveTheme()==='light';
+ $('bulb').setAttribute('aria-pressed',String(light));
+ $('bulb').title=light?'โหมดสว่าง · กดเพื่อเปลี่ยนเป็นโหมดมืด':'โหมดมืด · กดเพื่อเปลี่ยนเป็นโหมดสว่าง';
+ $('auto').setAttribute('aria-checked',String(theme==='auto'));
+ $('auto').title=theme==='auto'?'ตามการตั้งค่าของเครื่อง':'กดเพื่อให้ตามการตั้งค่าของเครื่อง';
 }
-if(!inViewer){
- let theme='auto';try{theme=localStorage.getItem(THEME_KEY)||'auto';}catch{}
- if(!themeLabels[theme])theme='auto';
- applyTheme(theme);$('theme').hidden=false;
- $('theme').onclick=()=>{theme={auto:'light',light:'dark',dark:'auto'}[theme];applyTheme(theme);try{localStorage.setItem(THEME_KEY,theme);}catch{}};
-}
+function saveTheme(){try{localStorage.setItem(THEME_KEY,theme);}catch{}applyTheme();}
+$('bulb').onclick=()=>{theme=effectiveTheme()==='light'?'dark':'light';saveTheme();};
+$('auto').onclick=()=>{theme=theme==='auto'?effectiveTheme():'auto';saveTheme();};
+darkQuery.addEventListener?.('change',applyTheme);
+applyTheme();
 
 /* ---------- Google Sheets mode ---------- */
 function showLogin(again){
@@ -519,9 +550,13 @@ function setupGoogle(){
 }
 function updateWho(){
  const s=store.session;
- $('who').hidden=$('logout').hidden=$('refresh').hidden=!s;
- $('who').textContent=s?s.name:'';
+ $('whoBox').hidden=false;
+ $('whoBox').classList.toggle('off',!s);
+ $('who').textContent=s?'เข้าสู่ระบบ: '+s.name:'ยังไม่ได้เข้าสู่ระบบ';
+ $('logout').hidden=$('refresh').hidden=!s;
+ $('loginOpen').hidden=!!s;
 }
+$('loginOpen').onclick=()=>showLogin(false);
 async function loadSheets(){
  loading=true;loadProblem='';render();
  try{fromServer(await api('bootstrap'));}
@@ -579,6 +614,7 @@ if(inViewer)(async()=>{
  $('mode').textContent='ข้อมูลใช้ร่วมกันกับทุกคนที่เข้าถึงหน้านี้';
  if(user){
   try{store.me=await user.id();}catch{}
+  try{const me=await user.me();if(me?.name){$('who').textContent=me.name;$('whoBox').hidden=false;}}catch{}
   try{if(await user.can('data.write')===false)store.canWrite=false;}catch{}
  }
  const slow=setTimeout(()=>{if(loading){loading=false;loadProblem='ยังเชื่อมต่อฐานข้อมูลไม่ได้ ข้อมูลจะแสดงเมื่อเชื่อมต่อสำเร็จ';render();}},10000);
