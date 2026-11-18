@@ -50,9 +50,9 @@ code{font-size:13px;background:var(--chip);padding:1px 6px;border-radius:6px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <main class="wrap">
-<div class="top"><a href="./">← กลับไปหน้าระบบ</a><span class="lead" style="margin:0">ลูกเทพศิลปศึกษา</span></div>
+<div class="top"><a href="./">← กลับหน้าแรก</a><span class="lead" style="margin:0">ลูกเทพศิลปศึกษา</span></div>
 <h1>คู่มือการใช้งาน</h1>
-<p class="lead">ระบบติดตามนักศึกษา สาขาศิลปศึกษา มหาวิทยาลัยราชภัฏเชียงใหม่ · ลองใช้ได้โดยไม่กระทบข้อมูลจริงที่ <a href="./?demo=1">โหมดทดลอง</a></p>
+<p class="lead">ระบบติดตามนักศึกษา สาขาศิลปศึกษา มหาวิทยาลัยราชภัฏเชียงใหม่ · ลองใช้ได้โดยไม่กระทบข้อมูลจริงที่ <a href="teacher.html?demo=1">โหมดทดลอง</a></p>
 <div class="tabs" role="tablist" aria-label="เลือกคู่มือ">
  <button role="tab" id="tab-student" aria-controls="student" aria-selected="true" type="button">สำหรับนักศึกษา</button>
  <button role="tab" id="tab-teacher" aria-controls="teacher" aria-selected="false" type="button">สำหรับอาจารย์</button>
@@ -63,8 +63,9 @@ code{font-size:13px;background:var(--chip);padding:1px 6px;border-radius:6px}
 <p>อาจารย์ใช้ระบบนี้ติดตามความก้าวหน้าของนักศึกษาสาขาศิลปศึกษาตลอด 4 ปี ตั้งแต่ผลการเรียน การเข้าเรียน ไปจนถึงการสังเกตการสอนและการทดลองสอน</p>
 
 <h2>เข้าสู่ระบบ</h2>
+<p>ลิงก์สำหรับนักศึกษา: <a href="student.html">student.html</a></p>
 <ol>
- <li>เปิดหน้าระบบ แล้วกดปุ่ม <b>ลงชื่อเข้าใช้ด้วย Google</b></li>
+ <li>เปิดหน้าเข้าสู่ระบบนักศึกษา แล้วกดปุ่ม <b>ลงชื่อเข้าใช้ด้วย Google</b></li>
  <li>เลือก <b>อีเมลมหาวิทยาลัย</b> รูปแบบ <code>รหัสนักศึกษา@g.cmru.ac.th</code> ระบบจะจับคู่กับรายชื่อให้เอง</li>
  <li>ถ้าอีเมลมหาวิทยาลัยของคุณไม่ได้ขึ้นต้นด้วยรหัสนักศึกษา และอาจารย์เปิดให้สมัครอยู่ ระบบจะให้กรอกรหัสนักศึกษาและชื่อ–นามสกุลให้ตรงกับรายชื่อ</li>
  <li>ถ้าขึ้นว่า “ไม่พบรหัสนักศึกษาในรายชื่อ” ให้แจ้งอาจารย์ให้นำเข้ารายชื่อรายวิชาก่อน</li>
@@ -88,8 +89,9 @@ code{font-size:13px;background:var(--chip);padding:1px 6px;border-radius:6px}
 
 <section class="panel" id="teacher" role="tabpanel" aria-labelledby="tab-teacher" hidden>
 <h2>เข้าสู่ระบบ</h2>
+<p>ลิงก์สำหรับอาจารย์: <a href="teacher.html">teacher.html</a></p>
 <ol>
- <li>กด <b>ลงชื่อเข้าใช้ด้วย Google</b> ด้วยอีเมลที่ผู้ดูแลเพิ่มไว้ในชีต “ผู้ใช้”</li>
+ <li>กด <b>ลงชื่อเข้าใช้ด้วย Google</b> ด้วยอีเมลที่อยู่ในรายชื่ออาจารย์ (หน้า ตั้งค่า) หรือที่ผู้ดูแลเพิ่มไว้ในชีต “ผู้ใช้”</li>
  <li>หรือกด “ใช้ชื่อผู้ใช้และรหัสผ่านแทน” ถ้าได้รับรหัสผ่านชั่วคราว ครั้งแรกระบบจะให้ตั้งรหัสผ่านใหม่อย่างน้อย 8 ตัวอักษร</li>
  <li>ระบบจำการเข้าสู่ระบบไว้ 6 ชั่วโมง หลังจากนั้นจะขอให้เข้าสู่ระบบอีกครั้ง</li>
 </ol>
@@ -169,7 +171,7 @@ code{font-size:13px;background:var(--chip);padding:1px 6px;border-radius:6px}
 </ul>
 
 <h2>โหมดทดลอง</h2>
-<p>เปิด <a href="./?demo=1">โหมดทดลอง</a> เพื่อฝึกใช้งานด้วยข้อมูลตัวอย่าง ทุกอย่างที่เพิ่ม แก้ หรือลบจะหายไปเมื่อปิดหน้า และไม่กระทบข้อมูลจริง</p>
+<p>เปิด <a href="teacher.html?demo=1">โหมดทดลอง</a> เพื่อฝึกใช้งานด้วยข้อมูลตัวอย่าง ทุกอย่างที่เพิ่ม แก้ หรือลบจะหายไปเมื่อปิดหน้า และไม่กระทบข้อมูลจริง</p>
 </section>
 </main>
 <script>

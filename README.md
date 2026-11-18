@@ -4,8 +4,16 @@
 
 เว็บไซต์: https://supernat9911.github.io/lukthep-arted-CMRU70/
 
-- `src/app.html` คือไฟล์ต้นฉบับ (เขียนเป็นเนื้อหาหน้า Artifact)
-- `docs/index.html` คือหน้าเว็บแบบไฟล์เดียวที่เปิดได้ทันที (GitHub Pages ใช้ไฟล์นี้) สร้างด้วย `node scripts/build.mjs`
+## ลิงก์
+- หน้าแรก: https://supernat9911.github.io/lukthep-arted-CMRU70/
+- อาจารย์: https://supernat9911.github.io/lukthep-arted-CMRU70/teacher.html
+- นักศึกษา: https://supernat9911.github.io/lukthep-arted-CMRU70/student.html
+- คู่มือ: https://supernat9911.github.io/lukthep-arted-CMRU70/guide.html
+
+## ไฟล์
+- `src/` ต้นฉบับ: `home.html` หน้าแรก, `app.html` ระบบ (ใช้ทั้งหน้าอาจารย์และนักศึกษา), `guide.html` คู่มือ
+- `docs/` เว็บที่ GitHub Pages ใช้ สร้างด้วย `node scripts/build.mjs` ห้ามแก้ไฟล์ใน docs/ ตรง ๆ
+- `apps-script/` โค้ดฝั่ง Google Sheets และคู่มือติดตั้ง
 
 ## การเก็บข้อมูล
 - **Google Sheets (แนะนำ สำหรับ GitHub Pages):** ติดตั้งตาม [apps-script/README.md](apps-script/README.md) แล้วใส่ URL ใน `const SHEETS_API` ใน `src/app.html` อาจารย์ต้องล็อกอินก่อนใช้งาน
