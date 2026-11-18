@@ -1,4 +1,4 @@
-// Wraps src/app.html (written as an Artifact page body) into a standalone dist/index.html.
+// Wraps src/app.html (written as an Artifact page body) into a standalone docs/index.html.
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 const body = readFileSync(new URL('../src/app.html', import.meta.url), 'utf8');
 const html = `<!doctype html>
@@ -6,6 +6,6 @@ const html = `<!doctype html>
 <style>[hidden]{display:none!important}img{max-width:100%}</style></head><body>
 ${body}</body></html>
 `;
-mkdirSync(new URL('../dist/', import.meta.url), { recursive: true });
-writeFileSync(new URL('../dist/index.html', import.meta.url), html);
-console.log('dist/index.html', html.length, 'bytes');
+mkdirSync(new URL('../docs/', import.meta.url), { recursive: true });
+writeFileSync(new URL('../docs/index.html', import.meta.url), html);
+console.log('docs/index.html', html.length, 'bytes');
