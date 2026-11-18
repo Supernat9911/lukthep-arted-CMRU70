@@ -1,7 +1,7 @@
 <title>ลูกเทพศิลปศึกษา</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <meta name="theme-color" content="#10111a">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
 <style>
 /* Layout: header band, summary cards, one filterable table; editing happens in a modal sheet. */
 :root{
@@ -10,7 +10,8 @@
  --accent:#6a55d6;--accent-ink:#ffffff;--soft:#ece8ff;--soft-line:#d6cdfb;--soft-ink:#43319f;
  --ok:#137353;--ok-bg:#dcf4e9;--warn:#8f520c;--warn-bg:#fcecd5;--crit:#a8244b;--crit-bg:#fbe3ea;
  --done:#4b39b0;--done-bg:#ebe6ff;--toast:#2b2545;--toast-ink:#ffffff;--shade:rgb(28 26 46/.45);
- --font:'Noto Sans Thai',system-ui,-apple-system,'Segoe UI',sans-serif;
+ --font:'IBM Plex Sans Thai',system-ui,-apple-system,'Segoe UI',sans-serif;
+ --display:'Anuphan','IBM Plex Sans Thai',system-ui,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
  --bg:#10111a;--head:#151621;--panel:#191a27;--panel-2:#1e1f2e;--line:#2d2e40;
@@ -37,6 +38,7 @@ header .wrap{min-height:74px;padding-block:10px}
 .mode{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 main{padding-block:36px 48px}
 h1,h2,p{margin:0}
+h1,h2,.brand,.card strong{font-family:var(--display)}
 h1{font-size:clamp(26px,4vw,35px);letter-spacing:-.025em;text-wrap:balance}
 h2{font-size:19px;text-wrap:balance}
 .intro{justify-content:space-between;margin-bottom:24px}
@@ -89,12 +91,14 @@ label input,label select,label textarea{width:100%;min-width:0}
 .history p{white-space:pre-wrap;overflow-wrap:anywhere;margin:4px 0 10px}
 .error{color:var(--crit);min-height:1.2em}
 .overdue{color:var(--crit);font-weight:600}
+#loginForm{display:grid;gap:12px;margin-top:14px}
+#loginForm .muted{font-size:13px}
 #confirmText{margin:12px 0 18px;white-space:pre-wrap}
 #toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));right:calc(20px + env(safe-area-inset-right,0px));background:var(--toast);color:var(--toast-ink);padding:12px 18px;border-radius:10px;z-index:10;max-width:calc(100vw - 40px)}
 @media(max-width:650px){.stats{grid-template-columns:repeat(2,1fr)}main{padding-top:24px}.toolbar{align-items:flex-start}.filters,.filters input{width:100%}.mode{margin-left:0}.fields{grid-template-columns:1fr;gap:8px}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
-<header><div class="wrap"><div class="logo" aria-hidden="true">ศ</div><div><div class="brand">ลูกเทพศิลปศึกษา</div><div class="muted">สาขาศิลปศึกษา มหาวิทยาลัยราชภัฏเชียงใหม่</div></div><div class="mode"><small id="mode">ข้อมูลบันทึกในเบราว์เซอร์นี้</small><button id="theme" class="ghost" type="button" hidden></button></div></div></header>
+<header><div class="wrap"><div class="logo" aria-hidden="true">ศ</div><div><div class="brand">ลูกเทพศิลปศึกษา</div><div class="muted">สาขาศิลปศึกษา มหาวิทยาลัยราชภัฏเชียงใหม่</div></div><div class="mode"><small id="mode">ข้อมูลบันทึกในเบราว์เซอร์นี้</small><button id="refresh" class="ghost" type="button" hidden>รีเฟรช</button><small id="who" hidden></small><button id="logout" class="ghost" type="button" hidden>ออกจากระบบ</button><button id="theme" class="ghost" type="button" hidden></button></div></div></header>
 <main class="wrap"><div class="row intro"><div><h1>ภาพรวมการติดตามนักศึกษา</h1><p class="muted">นักศึกษา · ประวัติการศึกษา · การเข้าเรียน · นัดหมายติดตาม</p></div><div class="row"><label class="filebtn" id="importWrap">นำเข้า CSV<input id="import" type="file" accept=".csv,text/csv"></label><button id="export" type="button">ดาวน์โหลด CSV</button><button id="add" class="primary" type="button">＋ เพิ่มนักศึกษา</button></div></div>
 <div class="notice" id="notice"><span id="alert">กำลังโหลดข้อมูล…</span><button id="clearDemo" class="ghost" type="button" hidden>ลบข้อมูลตัวอย่าง</button></div>
 <section class="stats" aria-label="สรุปการติดตาม" id="stats"></section>
@@ -112,8 +116,16 @@ label input,label select,label textarea{width:100%;min-width:0}
 <label class="wide">เพิ่มบันทึกการติดตาม<textarea id="f-note" name="note" rows="3" maxlength="2000" placeholder="การติดต่อ ผลการพูดคุย หรือสิ่งที่ต้องทำต่อ"></textarea></label></div>
 <p id="error" class="error" role="alert"></p><div class="row between"><button id="remove" type="button" class="danger">ลบข้อมูล</button><button id="submit" class="primary" type="submit">บันทึกข้อมูล</button></div></form><section class="history" id="history"></section></dialog>
 <dialog id="confirm" class="small" aria-labelledby="confirmTitle"><h2 id="confirmTitle">ยืนยัน</h2><p id="confirmText"></p><div class="row between"><button id="confirmNo" type="button">ยกเลิก</button><button id="confirmYes" type="button" class="primary"></button></div></dialog>
+<dialog id="login" class="small" aria-labelledby="loginTitle"><h2 id="loginTitle">เข้าสู่ระบบ</h2><p class="muted">สำหรับอาจารย์ผู้ดูแล ข้อมูลนักศึกษาเก็บใน Google Sheets ของสาขา</p>
+<form id="loginForm"><label>อีเมลหรือชื่อผู้ใช้<input id="l-user" autocomplete="username" required maxlength="200"></label>
+<label>รหัสผ่าน<input id="l-pass" type="password" autocomplete="current-password" required></label>
+<label id="newWrap" hidden>ตั้งรหัสผ่านใหม่ (อย่างน้อย 8 ตัวอักษร)<input id="l-new" type="password" autocomplete="new-password" minlength="8"></label>
+<p id="loginError" class="error" role="alert"></p><button id="loginBtn" class="primary" type="submit">เข้าสู่ระบบ</button>
+<p class="muted">ยังไม่มีบัญชี ให้ผู้ดูแลเพิ่มชื่อคุณในชีต “ผู้ใช้” พร้อมรหัสผ่านชั่วคราว</p></form></dialog>
 <div id="toast" role="status" hidden></div>
 <script>
+/* ใส่ URL ของ Google Apps Script Web App (ลงท้ายด้วย /exec) เพื่อเก็บข้อมูลใน Google Sheets ว่างไว้ = เก็บในเบราว์เซอร์ */
+const SHEETS_API = '';
 const $ = id => document.getElementById(id);
 const statuses = {normal:'ปกติ',watch:'เฝ้าระวัง',active:'กำลังติดตาม',done:'ติดตามแล้ว'};
 const stages = {none:'ยังไม่เริ่ม',doing:'กำลังดำเนินการ',pass:'ผ่าน',fail:'ไม่ผ่าน'};
@@ -125,6 +137,8 @@ const date = value => value ? new Intl.DateTimeFormat('th-TH',{dateStyle:'medium
 const stamp = value => new Intl.DateTimeFormat('th-TH',{dateStyle:'medium',timeStyle:'short',timeZone:TZ}).format(new Date(value));
 const KEY = 'lukthep-student-records-v1', THEME_KEY = 'lukthep-theme';
 const inViewer = typeof window.claude?.use === 'function';
+const useSheets = !inViewer && !!SHEETS_API;
+const SESSION_KEY = 'lukthep-session';
 
 /* ---------- data shape ---------- */
 const str = (v,max=2000) => (v==null?'':String(v)).trim().slice(0,max);
@@ -148,7 +162,7 @@ function clean(r){
  return {id:str(r.id,30),name:str(r.name,120),school:str(r.school,150),gpa:num(r.gpa,0,4),gpaNow:num(r.gpaNow,0,4),attendance:num(r.attendance,0,100),
   year:[1,2,3,4].includes(+r.year)?+r.year:'',term:[1,2].includes(+r.term)?+r.term:'',observe:stages[r.observe]?r.observe:'none',practice:stages[r.practice]?r.practice:'none',status:statuses[r.status]?r.status:'normal',due:isoDate(r.due),
   issue:str(r.issue,200),contact:str(r.contact,150),advisor:str(r.advisor,120),
-  notes:Array.isArray(r.notes)?r.notes.filter(n=>n&&typeof n.text==='string'&&n.at).map(n=>({at:String(n.at),text:n.text.slice(0,2000),...(n.by?{by:String(n.by)}:{})})):[],
+  notes:Array.isArray(r.notes)?r.notes.filter(n=>n&&typeof n.text==='string'&&n.at).map(n=>({at:String(n.at),text:n.text.slice(0,2000),...(n.by?{by:String(n.by)}:{}),...(n.byName?{byName:String(n.byName)}:{})})):[],
   demo:!!r.demo};
 }
 const examples = [
@@ -168,25 +182,42 @@ const local = {
  },
  write(next){localStorage.setItem(KEY,JSON.stringify(next.map(({_doc,...r})=>r)));records=next;render();}
 };
+async function api(action,payload={}){
+ const ctrl=new AbortController(),t=setTimeout(()=>ctrl.abort(),45000);
+ let data;
+ try{
+  const res=await fetch(SHEETS_API,{method:'POST',body:JSON.stringify({action,token:store.session?.token,...payload}),signal:ctrl.signal});
+  data=await res.json();
+ }catch{throw Object.assign(new Error('เชื่อมต่อ Google Sheets ไม่ได้ โปรดตรวจสอบอินเทอร์เน็ตแล้วลองอีกครั้ง'),{code:'network'});}
+ finally{clearTimeout(t);}
+ if(!data?.ok)throw Object.assign(new Error(data?.message||'เกิดข้อผิดพลาด'),{code:data?.code||'server_error'});
+ return data;
+}
+const forServer = ({_doc,notes,...r}) => r;
+function fromServer(data){records=(data.students??[]).map(clean).filter(r=>r.id&&r.name);loading=false;loadProblem='';render();}
 const store = {
- mode:'local', db:null, user:null, me:null, canWrite:true,
- async upsert(prev,next){
+ mode:'local', db:null, user:null, me:null, canWrite:true, session:null,
+ async upsert(prev,next,note){
+  if(this.mode==='sheets'){fromServer(await api('saveStudent',{prevId:prev?.id??null,student:forServer(next),note:note?.text??''}));return;}
+  next={...next,notes:[...await this.latestNotes(prev),...(note?[note]:[])]};
   if(this.mode==='local'){local.write(prev?records.map(r=>r===prev?next:r):[...records,next]);return;}
   const col=this.db.collection('students');
   const {_doc,...body}=next;
   await (prev?._doc?col.doc(prev._doc):col.doc()).set(body);
  },
  async remove(list){
+  if(this.mode==='sheets'){fromServer(await api('deleteStudents',{ids:list.map(r=>r.id)}));return;}
   if(this.mode==='local'){local.write(records.filter(r=>!list.includes(r)));return;}
   for(const r of list) await this.db.collection('students').doc(r._doc).delete();
  },
  async many(pairs){ // [[prev|null,next],...]
+  if(this.mode==='sheets'){fromServer(await api('importStudents',{rows:pairs.map(([prev,rec])=>({prevId:prev?.id??null,student:forServer(rec)}))}));return;}
   if(this.mode==='local'){
    let next=[...records];
    for(const [prev,rec] of pairs) next=prev?next.map(r=>r===prev?rec:r):[...next,rec];
    local.write(next);return;
   }
-  for(const [prev,rec] of pairs) await this.upsert(prev,rec);
+  for(const [prev,rec] of pairs){const {_doc,...body}=rec;await this.db.collection('students').doc(prev?._doc||undefined).set(body);}
  },
  async latestNotes(record){
   if(this.mode!=='db'||!record?._doc) return record?.notes??[];
@@ -194,8 +225,8 @@ const store = {
   return snap.exists?clean(snap.data()).notes:(record.notes??[]);
  }
 };
-let records = inViewer ? [] : local.load();
-let loading = inViewer, loadProblem = '';
+let records = inViewer||useSheets ? [] : local.load();
+let loading = inViewer||useSheets, loadProblem = '';
 let editing = null, timer;
 const form = $('form');
 for(const [value,label] of Object.entries(stages)){form.elements.observe.add(new Option(label,value));form.elements.practice.add(new Option(label,value));}
@@ -300,7 +331,8 @@ async function open(record){
  const authors=[];
  for(const entry of [...notes].reverse()){
   const meta=node('small',stamp(entry.at));
-  if(entry.by){const who=node('span');who.dataset.user=entry.by;meta.append(' · ',who);authors.push(entry.by);}
+  if(entry.byName)meta.append(' · '+entry.byName);
+  else if(entry.by){const who=node('span');who.dataset.user=entry.by;meta.append(' · ',who);authors.push(entry.by);}
   list.append(meta,node('p',entry.text));
  }
  $('editor').showModal();
@@ -312,6 +344,10 @@ async function open(record){
  }
 }
 function writeFailed(e){
+ if(store.mode==='sheets'){
+  if(e?.code==='auth'){showLogin();return 'หมดเวลาเข้าสู่ระบบ โปรดเข้าสู่ระบบอีกครั้งแล้วบันทึกใหม่';}
+  return e?.message||'บันทึกไม่สำเร็จ';
+ }
  if(e?.code==='invalid_argument'&&store.mode==='db'){store.canWrite=false;render();return 'คุณมีสิทธิ์ดูข้อมูลอย่างเดียว จึงบันทึกการเปลี่ยนแปลงไม่ได้';}
  if(e?.code==='quota_exceeded')return 'พื้นที่เก็บข้อมูลเต็ม โปรดลบข้อมูลที่ไม่ใช้แล้วก่อน';
  if(store.mode==='local')return 'บันทึกไม่สำเร็จ โปรดตรวจสอบพื้นที่จัดเก็บของเบราว์เซอร์';
@@ -328,10 +364,9 @@ form.addEventListener('submit',async event=>{
  const {note,...fields}=values;
  $('submit').disabled=true;
  try{
-  const notes=[...await store.latestNotes(editing)];
-  if(note)notes.push({at:new Date().toISOString(),text:note,...(store.me?{by:store.me}:{})});
-  const next={...clean({...fields,notes,demo:editing?.demo??false}),...(editing?._doc?{_doc:editing._doc}:{})};
-  await store.upsert(editing,next);
+  const entry=note?{at:new Date().toISOString(),text:note,...(store.me?{by:store.me}:{})}:null;
+  const next={...clean({...fields,notes:editing?.notes??[],demo:editing?.demo??false}),...(editing?._doc?{_doc:editing._doc}:{})};
+  await store.upsert(editing,next,entry);
   $('editor').close();toast('บันทึกข้อมูลแล้ว');
  }catch(e){$('error').textContent=writeFailed(e);}
  finally{$('submit').disabled=false;}
@@ -433,8 +468,62 @@ if(!inViewer){
  $('theme').onclick=()=>{theme={auto:'light',light:'dark',dark:'auto'}[theme];applyTheme(theme);try{localStorage.setItem(THEME_KEY,theme);}catch{}};
 }
 
+/* ---------- Google Sheets mode ---------- */
+function showLogin(){
+ $('loginError').textContent='';$('l-pass').value='';$('l-new').value='';$('newWrap').hidden=true;
+ if(!$('login').open)$('login').showModal();
+}
+function updateWho(){
+ const s=store.session;
+ $('who').hidden=$('logout').hidden=$('refresh').hidden=!s;
+ $('who').textContent=s?s.name:'';
+}
+async function loadSheets(){
+ loading=true;loadProblem='';render();
+ try{fromServer(await api('bootstrap'));}
+ catch(e){
+  loading=false;
+  if(e.code==='auth'){store.session=null;updateWho();showLogin();}
+  else loadProblem='โหลดข้อมูลไม่สำเร็จ: '+e.message;
+  render();
+ }
+}
+$('login').oncancel=e=>e.preventDefault();
+$('loginForm').onsubmit=async e=>{
+ e.preventDefault();
+ const newPassword=$('newWrap').hidden?undefined:$('l-new').value;
+ if(newPassword!==undefined&&newPassword.length<8){$('loginError').textContent='รหัสผ่านใหม่ต้องยาวอย่างน้อย 8 ตัวอักษร';return;}
+ $('loginBtn').disabled=true;$('loginError').textContent='';
+ try{
+  const r=await api('login',{username:$('l-user').value.trim(),password:$('l-pass').value,newPassword});
+  store.session={token:r.token,name:r.name,role:r.role};
+  try{localStorage.setItem(SESSION_KEY,JSON.stringify(store.session));}catch{}
+  $('login').close();updateWho();toast('ยินดีต้อนรับ '+r.name);
+  await loadSheets();
+ }catch(err){
+  if(err.code==='must_change'){$('newWrap').hidden=false;$('l-new').required=true;$('l-new').focus();}
+  $('loginError').textContent=err.message;
+ }finally{$('loginBtn').disabled=false;}
+};
+$('logout').onclick=async()=>{
+ const token=store.session?.token;
+ store.session=null;records=[];updateWho();render();
+ try{localStorage.removeItem(SESSION_KEY);}catch{}
+ if(token)api('logout',{token}).catch(()=>{});
+ showLogin();
+};
+$('refresh').onclick=()=>loadSheets();
+
 /* ---------- boot ---------- */
 render();
+if(useSheets){
+ store.mode='sheets';
+ $('mode').textContent='ข้อมูลเก็บใน Google Sheets';
+ try{store.session=JSON.parse(localStorage.getItem(SESSION_KEY));}catch{}
+ if(!store.session?.token)store.session=null;
+ updateWho();
+ if(store.session)loadSheets();else{loading=false;render();showLogin();}
+}
 if(inViewer)(async()=>{
  const [db,user]=await Promise.all([claude.use('db'),claude.use('user')]);
  if(!db){ // no shared store in this view: fall back to this browser
