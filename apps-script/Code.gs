@@ -6,7 +6,7 @@
  * ทุกคำตอบเป็น JSON {ok: true, ...} หรือ {ok: false, code, message}
  */
 
-var APP_VERSION = '1.2.0';
+var APP_VERSION = '1.3.0';
 var CEFR = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'];
 /** Client ID ของ Google Sign-In (ค่าเดียวกับในหน้าเว็บ) ว่างไว้ = ปิดการเข้าสู่ระบบด้วย Google */
 var GOOGLE_CLIENT_ID = '';
@@ -32,6 +32,11 @@ var SHEETS = {
   users: { name: 'ผู้ใช้', cols: [
     ['username', 'อีเมลหรือชื่อผู้ใช้'], ['name', 'ชื่อที่แสดง'], ['role', 'บทบาท (อาจารย์/นักศึกษา)'],
     ['tempPassword', 'รหัสผ่านชั่วคราว'], ['active', 'ปิดการใช้งาน (ใส่ ปิด)'], ['salt', 'salt (ระบบใช้)'], ['hash', 'hash (ระบบใช้)']] },
+  enrollments: { name: 'ลงทะเบียนเรียน', cols: [
+    ['studentId', 'รหัสนักศึกษา'], ['code', 'รหัสวิชา'], ['name', 'ชื่อวิชา'], ['term', 'ภาคเรียน/ปีการศึกษา'], ['section', 'หมู่เรียน']] },
+  accounts: { name: 'บัญชีนักศึกษา', cols: [
+    ['email', 'อีเมล'], ['studentId', 'รหัสนักศึกษา'], ['linkedAt', 'สมัครเมื่อ'], ['method', 'วิธีสมัคร']] },
+  settings: { name: 'ตั้งค่า', cols: [['key', 'คีย์ (ระบบใช้)'], ['value', 'ค่า'], ['label', 'คำอธิบาย']] },
   // ชีตสำหรับฟีเจอร์ระยะถัดไป (สร้างหัวคอลัมน์ไว้ก่อน)
   assignments: { name: 'งาน', cols: [
     ['id', 'รหัสงาน'], ['title', 'ชื่องาน'], ['detail', 'รายละเอียด'], ['year', 'ชั้นปี'], ['term', 'เทอม'],
@@ -87,10 +92,13 @@ function route_(p) {
   }
   var s = session_(p.token);
   if (p.action === 'me') return { name: s.name, role: s.role };
+  if (p.action === 'studentHome') return studentHome_(s);
   if (p.action === 'changePassword') return withLock_(function () { return changePassword_(s, p); });
   if (s.role !== 'teacher') throw fail_('forbidden', 'บัญชีนี้ไม่มีสิทธิ์ใช้งานส่วนของอาจารย์');
   switch (p.action) {
     case 'bootstrap': return bootstrap_();
+    case 'getSettings': return { settings: readSettings_() };
+    case 'saveSettings': return withLock_(function () { return { settings: saveSettings_(p.settings || {}) }; });
     case 'saveStudent': return withLock_(function () { saveStudent_(s, p); return bootstrap_(); });
     case 'deleteStudents': return withLock_(function () { deleteStudents_(p.ids); return bootstrap_(); });
     case 'importStudents': return withLock_(function () { importStudents_(s, p.rows); return bootstrap_(); });
@@ -145,11 +153,98 @@ function googleLogin_(p) {
     throw fail_('auth_failed', 'ยืนยันตัวตนกับ Google ไม่สำเร็จ โปรดลองอีกครั้ง');
   }
   var email = String(info.email).trim().toLowerCase();
+  return withLock_(function () { return googleAccount_(email, str_(info.name, 120), p); });
+}
+
+function googleAccount_(email, googleName, p) {
+  var settings = readSettings_();
   var u = readTable_('users').filter(function (x) {
     return String(x.username).trim().toLowerCase() === email && String(x.active).trim() !== 'ปิด';
   })[0];
-  if (!u) throw fail_('no_access', 'บัญชี ' + email + ' ยังไม่มีสิทธิ์ใช้งาน โปรดแจ้งผู้ดูแลให้เพิ่มอีเมลนี้ในระบบ');
-  return startSession_(u, email, str_(info.name, 120));
+  if (u) return startSession_(u, email, googleName);
+  if (settings.teacherEmails.indexOf(email) >= 0) return startSession_({ role: 'อาจารย์', name: '' }, email, googleName);
+
+  var at = email.lastIndexOf('@'), local = email.slice(0, at), domain = email.slice(at + 1);
+  if (settings.studentDomains.indexOf(domain) < 0) {
+    throw fail_('no_access', 'บัญชี ' + email + ' ยังไม่มีสิทธิ์ใช้งาน นักศึกษาโปรดใช้อีเมลมหาวิทยาลัย'
+      + (settings.studentDomains.length ? ' (@' + settings.studentDomains.join(', @') + ')' : '') + ' อาจารย์โปรดแจ้งผู้ดูแลให้เพิ่มอีเมลนี้');
+  }
+  var accounts = readTable_('accounts');
+  var linked = accounts.filter(function (a) { return a.email === email; })[0];
+  var students = readTable_('students');
+  var byId = {};
+  students.forEach(function (st) { byId[st.id] = st; });
+  var link = function (studentId, method) {
+    if (accounts.some(function (a) { return a.studentId === studentId && a.email !== email; })) {
+      throw fail_('taken', 'รหัสนักศึกษา ' + studentId + ' สมัครด้วยบัญชีอื่นไปแล้ว หากไม่ใช่คุณ โปรดแจ้งอาจารย์ทันที');
+    }
+    appendRow_('accounts', { email: email, studentId: studentId, linkedAt: new Date().toISOString(), method: method });
+    return studentSession_(byId[studentId], email);
+  };
+  if (linked && byId[linked.studentId]) return studentSession_(byId[linked.studentId], email);
+  if (/^\d{5,15}$/.test(local) && byId[local]) return link(local, 'อีเมลรหัสนักศึกษา');
+  if (/^\d{5,15}$/.test(local)) throw fail_('not_enrolled', 'ไม่พบรหัสนักศึกษา ' + local + ' ในรายชื่อ โปรดแจ้งอาจารย์ให้นำเข้ารายชื่อก่อน');
+  if (!settings.allowSelfRegister) throw fail_('no_access', 'โปรดเข้าสู่ระบบด้วยอีเมลมหาวิทยาลัยรูปแบบ รหัสนักศึกษา@' + domain);
+  var sid = str_(p.studentId, 15).replace(/\s/g, '');
+  if (!sid) throw fail_('need_register', 'บัญชีนี้ยังไม่ได้สมัคร กรอกรหัสนักศึกษาและชื่อ–นามสกุลเพื่อสมัคร');
+  var st = byId[sid];
+  if (!st || normName_(st.name) !== normName_(p.fullName)) throw fail_('need_register', 'รหัสนักศึกษาหรือชื่อ–นามสกุลไม่ตรงกับรายชื่อ โปรดตรวจอีกครั้ง');
+  return link(sid, 'สมัครด้วยรหัส + ชื่อ');
+}
+
+function normName_(v) {
+  return String(v || '').replace(/^(นาย|นางสาว|นาง|น\.ส\.|mr\.?|mrs\.?|ms\.?|miss)\s*/i, '').replace(/\s+/g, '').toLowerCase();
+}
+
+function studentSession_(st, email) {
+  var token = Utilities.getUuid().replace(/-/g, '') + Utilities.getUuid().replace(/-/g, '');
+  var s = { username: email, name: st.name, role: 'student', studentId: st.id };
+  CacheService.getScriptCache().put('s:' + token, JSON.stringify(s), SESSION_SECONDS);
+  return { token: token, name: s.name, role: s.role };
+}
+
+function studentHome_(s) {
+  if (s.role !== 'student') throw fail_('forbidden', 'สำหรับนักศึกษาเท่านั้น');
+  var st = readTable_('students').map(fromSheet_).filter(function (x) { return x.id === s.studentId; })[0];
+  if (!st) throw fail_('not_enrolled', 'ไม่พบข้อมูลของคุณในรายชื่อ โปรดติดต่ออาจารย์');
+  return { student: { id: st.id, name: st.name, year: st.year, term: st.term,
+    enroll: readTable_('enrollments').filter(function (e) { return e.studentId === st.id; }).map(enrollOut_) } };
+}
+
+/* ======================= ตั้งค่าการเข้าถึง ======================= */
+
+var SETTING_LABELS = {
+  teacherEmails: 'อีเมลอาจารย์ (บรรทัดละ 1)',
+  studentDomains: 'โดเมนอีเมลมหาวิทยาลัยที่นักศึกษาใช้ล็อกอิน',
+  maxFileMB: 'ขนาดไฟล์สูงสุดต่อไฟล์ (MB)',
+  allowSelfRegister: 'ให้บัญชีที่ไม่ใช่ <รหัส>@โดเมน สมัครด้วยรหัส + ชื่อ-นามสกุลได้'
+};
+
+function readSettings_() {
+  var raw = {};
+  readTable_('settings').forEach(function (r) { raw[r.key] = r.value; });
+  var list = function (v) { return String(v || '').split(/[\s,;]+/).map(function (x) { return x.trim().toLowerCase().replace(/^@/, ''); }).filter(Boolean); };
+  var mb = Number(raw.maxFileMB);
+  return {
+    teacherEmails: list(raw.teacherEmails),
+    studentDomains: list(raw.studentDomains),
+    maxFileMB: mb >= 1 && mb <= 50 ? mb : 20,
+    allowSelfRegister: String(raw.allowSelfRegister) === 'ใช่'
+  };
+}
+
+function saveSettings_(input) {
+  var list = function (v) { return (Array.isArray(v) ? v : String(v || '').split(/[\s,;]+/)).map(function (x) { return String(x).trim().toLowerCase().replace(/^@/, ''); }).filter(Boolean); };
+  var emails = list(input.teacherEmails), domains = list(input.studentDomains);
+  var badEmail = emails.filter(function (e) { return !/^[^@\s]+@[^@\s]+\.[a-z]{2,}$/.test(e); })[0];
+  if (badEmail) throw fail_('invalid', 'อีเมลไม่ถูกต้อง: ' + badEmail);
+  var badDomain = domains.filter(function (d) { return !/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(d); })[0];
+  if (badDomain) throw fail_('invalid', 'โดเมนไม่ถูกต้อง: ' + badDomain + ' (ใส่แบบ cmru.ac.th)');
+  var mb = Math.round(Number(input.maxFileMB));
+  if (!(mb >= 1 && mb <= 50)) throw fail_('invalid', 'ขนาดไฟล์ต้องอยู่ระหว่าง 1–50 MB (ข้อจำกัดของ Apps Script)');
+  var values = { teacherEmails: emails.join('\n'), studentDomains: domains.join('\n'), maxFileMB: String(mb), allowSelfRegister: input.allowSelfRegister ? 'ใช่' : '' };
+  writeTable_('settings', Object.keys(SETTING_LABELS).map(function (k) { return { key: k, value: values[k], label: SETTING_LABELS[k] }; }));
+  return readSettings_();
 }
 
 function startSession_(u, username, fallbackName) {
@@ -202,9 +297,29 @@ function bootstrap_() {
   readTable_('notes').forEach(function (n) {
     (notes[n.studentId] = notes[n.studentId] || []).push({ at: n.at, text: n.text, byName: n.byName });
   });
+  var enroll = {};
+  readTable_('enrollments').forEach(function (e) { (enroll[e.studentId] = enroll[e.studentId] || []).push(enrollOut_(e)); });
+  var accounts = {};
+  readTable_('accounts').forEach(function (a) { accounts[a.studentId] = true; });
   var students = readTable_('students').map(fromSheet_).filter(function (s) { return s.id && s.name; });
-  students.forEach(function (s) { s.notes = notes[s.id] || []; });
+  students.forEach(function (s) { s.notes = notes[s.id] || []; s.enroll = enroll[s.id] || []; s.hasAccount = !!accounts[s.id]; });
   return { students: students, serverTime: new Date().toISOString() };
+}
+
+function enrollOut_(e) { return { code: e.code, name: e.name, term: e.term, section: e.section }; }
+
+/** แทนที่รายวิชาของนักศึกษาที่ระบุด้วยรายการใหม่ (ไม่แตะคนอื่น) */
+function setEnrollments_(map) {
+  var ids = Object.keys(map);
+  if (!ids.length) return;
+  var keep = readTable_('enrollments').filter(function (e) { return !map.hasOwnProperty(e.studentId); });
+  ids.forEach(function (id) {
+    (map[id] || []).slice(0, 60).forEach(function (e) {
+      if (!e || !e.code) return;
+      keep.push({ studentId: id, code: str_(e.code, 20), name: str_(e.name, 150), term: str_(e.term, 10), section: str_(e.section, 10) });
+    });
+  });
+  writeTable_('enrollments', keep);
 }
 
 function saveStudent_(s, p) {
@@ -221,7 +336,11 @@ function saveStudent_(s, p) {
   writeTable_('students', rows.map(toSheet_));
   if (prevId && prevId !== st.id) {
     writeTable_('notes', readTable_('notes').map(function (n) { if (n.studentId === prevId) n.studentId = st.id; return n; }));
+    writeTable_('accounts', readTable_('accounts').map(function (a) { if (a.studentId === prevId) a.studentId = st.id; return a; }));
+    var gone = {}; gone[prevId] = [];
+    setEnrollments_(gone);
   }
+  if (Array.isArray(p.student.enroll)) { var m = {}; m[st.id] = p.student.enroll; setEnrollments_(m); }
   var note = str_(p.note, 2000);
   if (note) appendRow_('notes', { studentId: st.id, at: now, text: note, byName: s.name });
 }
@@ -231,23 +350,27 @@ function deleteStudents_(ids) {
   (ids || []).forEach(function (id) { drop[String(id)] = true; });
   writeTable_('students', readTable_('students').filter(function (r) { return !drop[r.id]; }));
   writeTable_('notes', readTable_('notes').filter(function (n) { return !drop[n.studentId]; }));
+  writeTable_('enrollments', readTable_('enrollments').filter(function (e) { return !drop[e.studentId]; }));
+  writeTable_('accounts', readTable_('accounts').filter(function (a) { return !drop[a.studentId]; }));
 }
 
 function importStudents_(s, list) {
   if (!Array.isArray(list) || !list.length) throw fail_('invalid', 'ไม่มีข้อมูลให้นำเข้า');
-  if (list.length > 2000) throw fail_('invalid', 'นำเข้าได้ครั้งละไม่เกิน 2,000 คน');
+  if (list.length > 3000) throw fail_('invalid', 'นำเข้าได้ครั้งละไม่เกิน 2,000 คน');
   var rows = readTable_('students').map(fromSheet_);
   var index = {};
   rows.forEach(function (r, i) { index[r.id] = i; });
-  var now = new Date().toISOString();
+  var now = new Date().toISOString(), enrollMap = {};
   list.forEach(function (item) {
     var st = cleanStudent_(item && item.student || {});
     if (!st.id || !st.name) return;
+    if (Array.isArray(item.student.enroll)) enrollMap[st.id] = item.student.enroll;
     st.updatedAt = now; st.updatedBy = s.name;
     if (index[st.id] != null) rows[index[st.id]] = st;
     else { index[st.id] = rows.length; rows.push(st); }
   });
   writeTable_('students', rows.map(toSheet_));
+  setEnrollments_(enrollMap);
 }
 
 function cleanStudent_(r) {
