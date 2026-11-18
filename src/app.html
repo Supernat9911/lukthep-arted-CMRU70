@@ -97,6 +97,8 @@ label input,label select,label textarea{width:100%;min-width:0}
 #login h2{font-size:26px}
 #login .sub{margin-top:6px}
 #gbtn{display:flex;justify-content:center;min-height:44px;margin-top:26px}
+.steps{text-align:left;margin:24px 0 0;padding:14px 16px 14px 34px;border-radius:12px;background:var(--panel-2);color:var(--label);font-size:14px;display:grid;gap:4px}
+.steps li::marker{color:var(--accent);font-weight:600}
 #loginForm,#registerForm{display:grid;gap:12px;margin-top:22px;text-align:left}
 .links{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:22px}
 a{color:var(--accent)}
@@ -182,7 +184,8 @@ a{color:var(--accent)}
 <label>ชื่อ–นามสกุล<input id="r-name" required maxlength="120"></label>
 <button id="registerBtn" class="primary" type="submit">สมัครและเข้าสู่ระบบ</button></form>
 <p id="loginError" class="error" role="alert"></p>
-<div class="links"><button id="usePassword" class="linkbtn" type="button" hidden>ใช้ชื่อผู้ใช้และรหัสผ่านแทน</button><a href="guide.html">คู่มือการใช้งาน</a><a href="?demo=1">ลองโหมดทดลอง</a></div></dialog>
+<ol class="steps" id="loginSteps" hidden></ol>
+<div class="links"><button id="usePassword" class="linkbtn" type="button" hidden>ใช้ชื่อผู้ใช้และรหัสผ่านแทน</button><a id="loginGuide" href="guide.html">คู่มือการใช้งาน</a><a id="loginDemo" href="?demo=1">ลองโหมดทดลอง</a><a id="loginSwitch" href="./" hidden></a></div></dialog>
 <dialog id="importDlg" aria-labelledby="importTitle"><div class="row between"><h2 id="importTitle">นำเข้ารายชื่อจากระบบทะเบียน</h2><button id="importClose" class="ghost" type="button" aria-label="ปิด">✕</button></div>
 <p class="muted lead">เลือกไฟล์ .xls “รายชื่อนักศึกษาลงทะเบียน” ที่ดาวน์โหลดจากระบบทะเบียน ระบบจะสร้างรายวิชาให้อัตโนมัติ นำเข้าซ้ำได้ (อัปเดตชื่อ ไม่ลบข้อมูลเดิม) หรือเลือกไฟล์ CSV ที่ดาวน์โหลดจากหน้านี้</p>
 <label class="drop" style="margin-top:14px">เลือกไฟล์ (.xls .xlsx .csv)<input id="importFile" type="file" accept=".xls,.xlsx,.csv,.htm,.html,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></label>
@@ -223,6 +226,7 @@ const date = value => value ? new Intl.DateTimeFormat('th-TH',{dateStyle:'medium
 const stamp = value => new Intl.DateTimeFormat('th-TH',{dateStyle:'medium',timeStyle:'short',timeZone:TZ}).format(new Date(value));
 const KEY = 'lukthep-student-records-v1', THEME_KEY = 'lukthep-theme';
 const inViewer = typeof window.claude?.use === 'function';
+const PORTAL = document.querySelector('meta[name="lukthep-portal"]')?.content || ''; // 'teacher' | 'student' | ''
 const demoMode = !inViewer && new URLSearchParams(location.search).has('demo');
 const useSheets = !inViewer && !demoMode && !!SHEETS_API;
 const SESSION_KEY = 'lukthep-session';
@@ -748,7 +752,7 @@ applyTheme();
 /* ---------- Google Sheets mode ---------- */
 function showLogin(again){
  $('loginError').textContent='';$('l-pass').value='';$('l-new').value='';$('newWrap').hidden=true;
- $('loginSub').textContent=again?'กรุณาเข้าสู่ระบบอีกครั้ง':'กรุณาเข้าสู่ระบบ';
+ $('loginSub').textContent=again?'กรุณาเข้าสู่ระบบอีกครั้ง':(PORTAL_TEXT[PORTAL]?.sub??'กรุณาเข้าสู่ระบบ');
  if(!$('login').open)$('login').showModal();
 }
 async function signedIn(r){
@@ -765,11 +769,28 @@ $('registerForm').onsubmit=async e=>{
  catch(err){$('loginError').textContent=err.code==='auth_failed'?'หมดเวลา โปรดกดปุ่ม Google อีกครั้ง':err.message;}
  finally{$('registerBtn').disabled=false;}
 };
+const PORTAL_TEXT = {
+ teacher:{title:'เข้าสู่ระบบ · อาจารย์',sub:'สำหรับอาจารย์ผู้ดูแลนักศึกษาสาขาศิลปศึกษา',guide:'guide.html#teacher',guideLabel:'คู่มืออาจารย์',
+  switchHref:'student.html',switchLabel:'เป็นนักศึกษา? เข้าสู่ระบบที่นี่',
+  steps:['กด “ลงชื่อเข้าใช้ด้วย Google” แล้วเลือกอีเมลที่ผู้ดูแลเพิ่มไว้ในรายชื่ออาจารย์','ถ้าได้รับรหัสผ่านชั่วคราว กด “ใช้ชื่อผู้ใช้และรหัสผ่านแทน” ครั้งแรกระบบจะให้ตั้งรหัสใหม่','ถ้าขึ้นว่ายังไม่มีสิทธิ์ใช้งาน ให้แจ้งผู้ดูแลระบบเพิ่มอีเมลของคุณ']},
+ student:{title:'เข้าสู่ระบบ · นักศึกษา',sub:'ใช้อีเมลมหาวิทยาลัย รหัสนักศึกษา@g.cmru.ac.th',guide:'guide.html#student',guideLabel:'คู่มือนักศึกษา',
+  switchHref:'teacher.html',switchLabel:'เป็นอาจารย์? เข้าสู่ระบบที่นี่',
+  steps:['กด “ลงชื่อเข้าใช้ด้วย Google”','เลือกอีเมลมหาวิทยาลัยของคุณ (ไม่ใช่ Gmail ส่วนตัว)','ครั้งแรก ถ้าระบบให้กรอกรหัสนักศึกษาและชื่อ–นามสกุล ให้กรอกตรงกับทะเบียน','เข้าไม่ได้ ให้แจ้งอาจารย์ที่ปรึกษาหรืออาจารย์ประจำวิชา']}
+};
+function applyPortal(){
+ const t=PORTAL_TEXT[PORTAL];
+ if(!t)return;
+ $('loginTitle').textContent=t.title;
+ $('loginGuide').href=t.guide;$('loginGuide').textContent=t.guideLabel;$('guideLink').href=t.guide;
+ $('loginSwitch').href=t.switchHref;$('loginSwitch').textContent=t.switchLabel;$('loginSwitch').hidden=false;
+ $('loginSteps').replaceChildren(...t.steps.map(x=>node('li',x)));$('loginSteps').hidden=false;
+ $('loginDemo').hidden=PORTAL==='student';
+}
 function setupGoogle(){
  const usePw=()=>{$('loginForm').hidden=false;$('usePassword').hidden=true;};
  $('usePassword').onclick=usePw;
  if(!GOOGLE_CLIENT_ID){usePw();return;}
- $('loginForm').hidden=true;$('usePassword').hidden=false;$('gbtn').hidden=false;
+ $('loginForm').hidden=true;$('usePassword').hidden=PORTAL==='student';$('gbtn').hidden=false;
  const script=document.createElement('script');
  script.src='https://accounts.google.com/gsi/client';script.async=true;
  script.onerror=()=>{$('loginError').textContent='โหลดปุ่ม Google ไม่ได้ ใช้ชื่อผู้ใช้และรหัสผ่านแทนได้';usePw();};
@@ -874,6 +895,7 @@ $('refresh').onclick=()=>loadSheets();
 /* ---------- boot ---------- */
 render();
 if(!inViewer)$('guideLink').hidden=false;
+applyPortal();
 if(demoMode){$('demoBar').hidden=false;$('mode').textContent='โหมดทดลอง';}
 if(useSheets){
  setupGoogle();

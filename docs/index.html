@@ -3,915 +3,135 @@
 <style>[hidden]{display:none!important}img{max-width:100%}</style></head><body>
 <title>ลูกเทพศิลปศึกษา</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<meta name="theme-color" content="#10111a">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
 <style>
-/* Layout: header band, summary cards, one filterable table; editing happens in a modal sheet. */
+/* Layout: brand header, short intro, two login cards (teacher / student), quick how-to, footer links. */
 :root{
- --bg:#f5f4fa;--head:#eeecf7;--panel:#ffffff;--panel-2:#f3f1fa;--line:#e2dfee;
- --field:#ffffff;--field-line:#cbc6de;--ink:#1c1a2e;--muted:#5f5c78;--label:#3b3956;
- --accent:#6a55d6;--accent-ink:#ffffff;--soft:#ece8ff;--soft-line:#d6cdfb;--soft-ink:#43319f;
- --ok:#137353;--ok-bg:#dcf4e9;--warn:#8f520c;--warn-bg:#fcecd5;--crit:#a8244b;--crit-bg:#fbe3ea;
- --done:#4b39b0;--done-bg:#ebe6ff;--toast:#2b2545;--toast-ink:#ffffff;--shade:rgb(28 26 46/.45);
- --bulb:#f2b632;--bulb-glow:rgb(242 182 50/.28);
+ --bg:#f5f4fa;--head:#eeecf7;--panel:#ffffff;--panel-2:#f3f1fa;--line:#e2dfee;--ink:#1c1a2e;--muted:#5f5c78;
+ --accent:#6a55d6;--accent-ink:#ffffff;--soft:#ece8ff;--soft-ink:#43319f;--ok:#137353;--ok-bg:#dcf4e9;--warn:#8f520c;--warn-bg:#fcecd5;
  --font:'IBM Plex Sans Thai',system-ui,-apple-system,'Segoe UI',sans-serif;
  --display:'Anuphan','IBM Plex Sans Thai',system-ui,sans-serif;
 }
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
- --bg:#10111a;--head:#151621;--panel:#191a27;--panel-2:#1e1f2e;--line:#2d2e40;
- --field:#222333;--field-line:#414257;--ink:#f6f4ff;--muted:#a3a6bd;--label:#d5d4e7;
- --accent:#b4a5ff;--accent-ink:#181328;--soft:#252139;--soft-line:#40365d;--soft-ink:#ddd4ff;
- --ok:#a6eed1;--ok-bg:#233b37;--warn:#ffcf97;--warn-bg:#413427;--crit:#ffc1d3;--crit-bg:#402b39;
- --done:#d5c9ff;--done-bg:#30294a;--toast:#30294a;--toast-ink:#ffffff;--shade:rgb(5 5 10/.6);color-scheme:dark}}
+ --bg:#10111a;--head:#151621;--panel:#191a27;--panel-2:#1e1f2e;--line:#2d2e40;--ink:#f6f4ff;--muted:#a3a6bd;
+ --accent:#b4a5ff;--accent-ink:#181328;--soft:#252139;--soft-ink:#ddd4ff;--ok:#a6eed1;--ok-bg:#233b37;--warn:#ffcf97;--warn-bg:#413427;color-scheme:dark}}
 :root[data-theme="dark"]{
- --bg:#10111a;--head:#151621;--panel:#191a27;--panel-2:#1e1f2e;--line:#2d2e40;
- --field:#222333;--field-line:#414257;--ink:#f6f4ff;--muted:#a3a6bd;--label:#d5d4e7;
- --accent:#b4a5ff;--accent-ink:#181328;--soft:#252139;--soft-line:#40365d;--soft-ink:#ddd4ff;
- --ok:#a6eed1;--ok-bg:#233b37;--warn:#ffcf97;--warn-bg:#413427;--crit:#ffc1d3;--crit-bg:#402b39;
- --done:#d5c9ff;--done-bg:#30294a;--toast:#30294a;--toast-ink:#ffffff;--shade:rgb(5 5 10/.6);color-scheme:dark}
+ --bg:#10111a;--head:#151621;--panel:#191a27;--panel-2:#1e1f2e;--line:#2d2e40;--ink:#f6f4ff;--muted:#a3a6bd;
+ --accent:#b4a5ff;--accent-ink:#181328;--soft:#252139;--soft-ink:#ddd4ff;--ok:#a6eed1;--ok-bg:#233b37;--warn:#ffcf97;--warn-bg:#413427;color-scheme:dark}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.55 var(--font)}
-.wrap{max-width:1262px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
-header{border-bottom:1px solid var(--line);background:var(--head)}
-header .wrap,.row,.toolbar{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
-header .wrap{min-height:74px;padding-block:10px}
-.logo,.avatar{display:grid;place-items:center;flex:none;border-radius:12px;background:var(--soft);color:var(--soft-ink);font-weight:700}
-.logo{width:42px;height:42px;font-size:21px}
-.brand{font-size:17px;font-weight:700}
-.muted,small{color:var(--muted)}
-.mode{margin-left:auto;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
-main{padding-block:36px 48px}
-h1,h2,p{margin:0}
-h1,h2,.brand,.card strong{font-family:var(--display)}
-h1{font-size:clamp(26px,4vw,35px);letter-spacing:-.025em;text-wrap:balance}
-h2{font-size:19px;text-wrap:balance}
-.intro{justify-content:space-between;margin-bottom:24px}
-.intro p{margin-top:4px}
-.notice{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;background:var(--soft);border:1px solid var(--soft-line);color:var(--soft-ink);border-radius:12px;padding:10px 16px;margin-bottom:15px;min-height:46px}
-.notice.bad{background:var(--crit-bg);border-color:transparent;color:var(--crit)}
-.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:13px;margin-bottom:20px}
-.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:14px}
-.card{padding:15px 17px}
-.card strong{display:block;font-size:28px;line-height:1.5;font-variant-numeric:tabular-nums}
-.card:nth-child(2) strong{color:var(--warn)}.card:nth-child(3) strong{color:var(--crit)}.card:nth-child(4) strong{color:var(--ok)}
-.toolbar{padding:16px 18px;justify-content:space-between}
-.filters{display:flex;gap:8px;flex-wrap:wrap}
-button,input,select,textarea,.filebtn{font:inherit;color:inherit;border:1px solid var(--field-line);border-radius:8px;background:var(--field);padding:8px 11px}
-button,.filebtn{cursor:pointer;font-weight:600}
-button:hover,.filebtn:hover{border-color:var(--accent)}
-button:disabled{opacity:.55;cursor:progress}
-button.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}
-button.danger{color:var(--crit)}
-button.danger.solid{background:var(--crit);color:var(--panel);border-color:transparent}
-button.ghost{background:transparent;border-color:transparent;padding:6px 9px}
-.filebtn:focus-within,:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.filebtn input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
-.filebtn{position:relative;display:inline-block}
-.table{overflow-x:auto}
-table{width:100%;min-width:1480px;border-collapse:collapse;text-align:left}
-th,td{padding:12px;border-top:1px solid var(--line);vertical-align:middle}
-th:first-child,td:first-child{padding-left:18px}
-th{color:var(--muted);background:var(--panel-2);font-size:12px;white-space:nowrap}
-td{font-variant-numeric:tabular-nums}
-td{white-space:nowrap}
-td small{display:block;white-space:normal;max-width:240px}
-.avatar{width:33px;height:33px;border-radius:10px}
-.person{display:flex;align-items:center;gap:9px;white-space:nowrap}
-.pill{display:inline-block;border-radius:20px;padding:3px 9px;font-size:12px;background:var(--ok-bg);color:var(--ok);white-space:nowrap}
-.pill.watch{background:var(--warn-bg);color:var(--warn)}
-.pill.active{background:var(--crit-bg);color:var(--crit)}
-.pill.done{background:var(--done-bg);color:var(--done)}
-.pill.none{background:var(--panel-2);color:var(--muted)}
-.foot{padding:14px 18px;border-top:1px solid var(--line)}
-dialog{width:min(660px,94vw);max-height:90dvh;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:16px;padding:22px}
-dialog.small{width:min(420px,94vw)}
-dialog::backdrop{background:var(--shade)}
-.between{justify-content:space-between}
-.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:16px 0}
-label{display:grid;gap:5px;color:var(--label)}
-label input,label select,label textarea{width:100%;min-width:0}
-.wide{grid-column:1/-1}
-.history{border-top:1px solid var(--line);margin-top:16px;padding-top:12px}
-.history p{white-space:pre-wrap;overflow-wrap:anywhere;margin:4px 0 10px}
-.error{color:var(--crit);min-height:1.2em}
-.overdue{color:var(--crit);font-weight:600}
-#login{width:min(520px,94vw);padding:44px 28px 36px;text-align:center}
-#login::backdrop{background:var(--bg)}
-#login h2{font-size:26px}
-#login .sub{margin-top:6px}
-#gbtn{display:flex;justify-content:center;min-height:44px;margin-top:26px}
-#loginForm,#registerForm{display:grid;gap:12px;margin-top:22px;text-align:left}
-.links{display:flex;justify-content:center;gap:18px;flex-wrap:wrap;margin-top:22px}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 var(--font)}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{background:var(--head);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;gap:12px;min-height:74px;padding-block:10px}
+.logo{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:var(--soft);color:var(--soft-ink);font:700 21px var(--display)}
+.brand{font:700 17px/1.4 var(--display)}
+.muted{color:var(--muted)}
+header .guide{margin-left:auto}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.35;text-wrap:balance}
+h1{font-size:clamp(28px,4.6vw,40px);letter-spacing:-.02em}
+h2{font-size:22px}
+h3{font-size:16px}
+p,ul,ol{margin:0}
 a{color:var(--accent)}
-.linkbtn{background:none;border:0;padding:0;color:var(--accent);text-decoration:underline;font-weight:500}
-.themectl{display:flex;align-items:center;gap:8px;padding:3px 4px 3px 3px;border:1px solid var(--line);border-radius:999px;background:var(--panel)}
-.iconbtn{display:grid;place-items:center;width:34px;height:34px;padding:0;border-radius:50%;border:0;background:transparent;color:var(--muted)}
-.iconbtn:hover{background:var(--panel-2)}
-.iconbtn .glass{fill:none}
-.iconbtn .rays{opacity:0}
-.iconbtn[aria-pressed="true"]{color:var(--bulb);background:var(--bulb-glow)}
-.iconbtn[aria-pressed="true"] .glass{fill:var(--bulb)}
-.iconbtn[aria-pressed="true"] .rays{opacity:1}
-.switch{display:flex;align-items:center;gap:7px;border:0;background:transparent;padding:4px 6px;font-size:13px;font-weight:500;color:var(--muted)}
-.switch .track{position:relative;width:32px;height:18px;border-radius:999px;background:var(--field-line);transition:background .15s}
-.switch .knob{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:var(--panel);transition:transform .15s}
-.switch[aria-checked="true"]{color:var(--ink)}
-.switch[aria-checked="true"] .track{background:var(--accent)}
-.switch[aria-checked="true"] .knob{transform:translateX(14px)}
-.whobox{display:flex;align-items:center;gap:7px;font-size:13px;padding:5px 11px;border-radius:999px;background:var(--ok-bg);color:var(--ok);font-weight:500}
-.whobox.off{background:var(--panel-2);color:var(--muted)}
-.whobox .dot{width:8px;height:8px;border-radius:50%;background:currentColor}
-.drop{display:grid;gap:8px;border:1.5px dashed var(--field-line);border-radius:12px;padding:16px;background:var(--panel-2);color:var(--label);cursor:pointer}
-.drop:hover,.drop:focus-within{border-color:var(--accent)}
-.drop input{border:0;background:transparent;padding:0}
-#importDlg{width:min(760px,94vw)}
-#importDlg .lead{margin-top:6px}
-.plan-rows{max-height:280px;overflow:auto;border:1px solid var(--line);border-radius:10px;margin-top:10px}
-.plan-rows table{min-width:520px}
-.plan-rows th{position:sticky;top:0}
-.tag{display:inline-block;font-size:12px;border-radius:20px;padding:1px 8px;background:var(--ok-bg);color:var(--ok);white-space:nowrap}
-.tag.upd{background:var(--done-bg);color:var(--done)}.tag.same{background:var(--panel-2);color:var(--muted)}
-.summary{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.sid{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap}
-.main-table th:first-child,.main-table td:first-child{position:sticky;left:0;z-index:1;background:var(--panel);box-shadow:1px 0 0 var(--line)}
-.main-table th:first-child{background:var(--panel-2)}
-.acct{display:inline-block;font-size:12px;border-radius:20px;padding:2px 9px;background:var(--warn-bg);color:var(--warn);font-weight:500;margin-left:8px;vertical-align:middle}
-#settingsDlg{width:min(720px,94vw)}
-#settingsForm{display:grid;gap:14px;margin-top:14px}
-#settingsForm textarea{resize:vertical}
-.check{display:flex;align-items:flex-start;gap:10px;grid-template-columns:none}
-.check input{width:18px;height:18px;margin-top:3px;flex:none}
-.student-home{display:grid;gap:16px}
-.student-home .panel{padding:20px 22px}
-.demo-bar{background:var(--warn-bg);color:var(--warn);text-align:center;padding:8px 16px;font-weight:600}
-.demo-bar a{color:inherit}
-#confirmText{margin:12px 0 18px;white-space:pre-wrap}
-#toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));right:calc(20px + env(safe-area-inset-right,0px));background:var(--toast);color:var(--toast-ink);padding:12px 18px;border-radius:10px;z-index:10;max-width:calc(100vw - 40px)}
-@media(max-width:650px){.stats{grid-template-columns:repeat(2,1fr)}main{padding-top:24px}.toolbar{align-items:flex-start}.filters,.filters input{width:100%}.mode{margin-left:0}.fields{grid-template-columns:1fr;gap:8px}}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+main{padding-block:44px 64px;display:grid;gap:36px}
+.intro{display:grid;gap:10px;max-width:68ch}
+.session{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--ok-bg);color:var(--ok);border-radius:12px;padding:10px 16px;font-weight:500}
+.portals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.portal{display:grid;gap:14px;align-content:start;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px}
+.portal .who{display:flex;align-items:center;gap:12px}
+.badge{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--soft);color:var(--soft-ink);flex:none}
+.portal ul{padding-left:20px;display:grid;gap:4px}
+.portal .actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.btn{display:inline-block;text-decoration:none;font-weight:600;border-radius:10px;padding:11px 18px;background:var(--accent);color:var(--accent-ink)}
+.btn:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.copy{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.copy code{background:var(--panel-2);padding:3px 8px;border-radius:6px;color:var(--ink);overflow-wrap:anywhere}
+.copy button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:3px 9px;cursor:pointer}
+.howto{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.howto section{display:grid;gap:10px;align-content:start}
+.howto ol{padding-left:22px;display:grid;gap:6px}
+.note{background:var(--panel-2);border-radius:12px;padding:14px 18px;display:grid;gap:4px}
+footer{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:14px;border-top:1px solid var(--line);padding-top:18px}
+@media(max-width:720px){.portals,.howto{grid-template-columns:1fr}}
 </style>
-<div class="demo-bar" id="demoBar" hidden>โหมดทดลอง · ข้อมูลในหน้านี้ไม่ถูกบันทึก และไม่กระทบข้อมูลจริง · <a href="./">ออกจากโหมดทดลอง</a></div>
-<header><div class="wrap"><div class="logo" aria-hidden="true">ศ</div><div><div class="brand">ลูกเทพศิลปศึกษา</div><div class="muted">สาขาศิลปศึกษา มหาวิทยาลัยราชภัฏเชียงใหม่</div></div><div class="mode"><small id="mode">ข้อมูลบันทึกในเบราว์เซอร์นี้</small><a id="guideLink" href="guide.html" hidden>คู่มือ</a>
-<span class="whobox" id="whoBox" hidden><span class="dot" aria-hidden="true"></span><span id="who"></span></span>
-<button id="loginOpen" class="ghost" type="button" hidden>เข้าสู่ระบบ</button><button id="refresh" class="ghost" type="button" hidden>รีเฟรช</button><button id="settingsOpen" class="ghost" type="button" hidden>ตั้งค่า</button><button id="logout" class="ghost" type="button" hidden>ออกจากระบบ</button>
-<div class="themectl"><button id="bulb" class="iconbtn" type="button" aria-pressed="false" aria-label="สลับโหมดสว่าง/มืด"><svg viewBox="-2 -2 28 28" width="22" height="22" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path class="glass" d="M12 3a6 6 0 0 0-3.6 10.8c.6.5 1 1.2 1 2v.7h5.2v-.7c0-.8.4-1.5 1-2A6 6 0 0 0 12 3z"/><path d="M9.6 19h4.8M10.4 21.6h3.2" fill="none"/><g class="rays" fill="none"><path d="M12 -1.2v1.6M3.2 9.6H1.6M22.4 9.6h-1.6M5 2.6l1.1 1.1M19 2.6l-1.1 1.1"/></g></svg></button><button id="auto" class="switch" type="button" role="switch" aria-checked="true"><span class="track" aria-hidden="true"><span class="knob"></span></span>อัตโนมัติ</button></div></div></div></header>
-<main class="wrap" id="studentMain" hidden></main>
-<main class="wrap" id="teacherMain"><div class="row intro"><div><h1>ภาพรวมการติดตามนักศึกษา</h1><p class="muted">นักศึกษา · ประวัติการศึกษา · การเข้าเรียน · นัดหมายติดตาม</p></div><div class="row"><button id="importOpen" type="button">นำเข้าข้อมูล</button><button id="export" type="button">ดาวน์โหลด CSV</button><button id="add" class="primary" type="button">＋ เพิ่มนักศึกษา</button></div></div>
-<div class="notice" id="notice"><span id="alert">กำลังโหลดข้อมูล…</span><button id="clearDemo" class="ghost" type="button" hidden>ลบข้อมูลตัวอย่าง</button></div>
-<section class="stats" aria-label="สรุปการติดตาม" id="stats"></section>
-<section class="panel"><div class="toolbar"><h2>รายชื่อนักศึกษา<span class="acct" id="acctChip" hidden></span></h2><div class="filters"><input id="search" type="search" placeholder="ค้นหาชื่อ รหัส หรือโรงเรียน" aria-label="ค้นหาชื่อ รหัส หรือโรงเรียน"><select id="courseFilter" aria-label="กรองรายวิชา" hidden><option value="">ทุกรายวิชา</option></select><select id="yearFilter" aria-label="กรองชั้นปี"><option value="">ทุกชั้นปี</option></select><select id="filter" aria-label="กรองสถานะ"><option value="">ทุกสถานะ</option></select></div></div>
-<div class="table"><table class="main-table"><thead><tr><th>รหัส</th><th>ชื่อ–นามสกุล</th><th>รายวิชา / หมู่เรียน</th><th>ชั้นปี / เทอม</th><th>โรงเรียนที่จบมา</th><th>เกรดเฉลี่ยเดิม</th><th>เกรดเฉลี่ยปัจจุบัน</th><th>ภาษาอังกฤษ</th><th>เข้าเรียน</th><th>สังเกตการสอน</th><th>ทดลองสอน</th><th>สถานะติดตาม</th><th>นัดครั้งถัดไป</th><th>จัดการ</th></tr></thead><tbody id="rows"></tbody></table></div><div id="count" class="foot muted"></div></section></main>
-<dialog id="editor" aria-labelledby="dialogTitle"><div class="row between"><h2 id="dialogTitle"></h2><button id="close" aria-label="ปิด" type="button" class="ghost">✕</button></div><form id="form"><div class="fields">
-<label>รหัสนักศึกษา<input id="f-id" name="id" required maxlength="30"></label><label>ชื่อ–นามสกุล<input id="f-name" name="name" required maxlength="120"></label>
-<label>ชั้นปี<select id="f-year" name="year"><option value="">—</option><option value="1">ปี 1</option><option value="2">ปี 2</option><option value="3">ปี 3</option><option value="4">ปี 4</option></select></label><label>เทอม<select id="f-term" name="term"><option value="">—</option><option value="1">เทอม 1</option><option value="2">เทอม 2</option></select></label>
-<label>โรงเรียนที่จบมา<input id="f-school" name="school" maxlength="150"></label><label>เกรดเฉลี่ยเดิม<input id="f-gpa" name="gpa" type="number" min="0" max="4" step="0.01"></label>
-<label>เกรดเฉลี่ยปัจจุบัน<input id="f-gpaNow" name="gpaNow" type="number" min="0" max="4" step="0.01"></label><label>เข้าเรียน (%)<input id="f-attendance" name="attendance" type="number" min="0" max="100"></label>
-<label>คะแนนภาษาอังกฤษ (0–100)<input id="f-englishScore" name="englishScore" type="number" min="0" max="100" step="0.5"></label><label>ระดับภาษาอังกฤษ (CEFR)<select id="f-englishLevel" name="englishLevel"><option value="">—</option><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option><option>C2</option></select></label>
-<label>สังเกตการสอน<select id="f-observe" name="observe"></select></label><label>ทดลองสอน<select id="f-practice" name="practice"></select></label>
-<label>ช่องทางติดต่อ<input id="f-contact" name="contact" maxlength="150"></label><label>ผู้รับผิดชอบติดตาม<input id="f-advisor" name="advisor" maxlength="120"></label>
-<label>สถานะติดตาม<select id="f-status" name="status"></select></label><label>นัดติดตามครั้งถัดไป<input id="f-due" name="due" type="date"></label>
-<label class="wide">ประเด็นที่ติดตาม<input id="f-issue" name="issue" maxlength="200"></label>
-<label class="wide">เพิ่มบันทึกการติดตาม<textarea id="f-note" name="note" rows="3" maxlength="2000" placeholder="การติดต่อ ผลการพูดคุย หรือสิ่งที่ต้องทำต่อ"></textarea></label></div>
-<p id="error" class="error" role="alert"></p><div class="row between"><button id="remove" type="button" class="danger">ลบข้อมูล</button><button id="submit" class="primary" type="submit">บันทึกข้อมูล</button></div></form><section class="history" id="history"></section></dialog>
-<dialog id="confirm" class="small" aria-labelledby="confirmTitle"><h2 id="confirmTitle">ยืนยัน</h2><p id="confirmText"></p><div class="row between"><button id="confirmNo" type="button">ยกเลิก</button><button id="confirmYes" type="button" class="primary"></button></div></dialog>
-<dialog id="login" aria-labelledby="loginTitle"><h2 id="loginTitle">เข้าสู่ระบบ</h2><p class="muted sub" id="loginSub">กรุณาเข้าสู่ระบบ</p>
-<div id="gbtn" hidden></div>
-<form id="loginForm"><label>อีเมลหรือชื่อผู้ใช้<input id="l-user" autocomplete="username" required maxlength="200"></label>
-<label>รหัสผ่าน<input id="l-pass" type="password" autocomplete="current-password" required></label>
-<label id="newWrap" hidden>ตั้งรหัสผ่านใหม่ (อย่างน้อย 8 ตัวอักษร)<input id="l-new" type="password" autocomplete="new-password" minlength="8"></label>
-<button id="loginBtn" class="primary" type="submit">เข้าสู่ระบบ</button></form>
-<form id="registerForm" hidden><p class="muted">สมัครครั้งแรก: กรอกรหัสนักศึกษาและชื่อ–นามสกุลให้ตรงกับรายชื่อที่อาจารย์นำเข้า</p>
-<label>รหัสนักศึกษา<input id="r-id" inputmode="numeric" required maxlength="15"></label>
-<label>ชื่อ–นามสกุล<input id="r-name" required maxlength="120"></label>
-<button id="registerBtn" class="primary" type="submit">สมัครและเข้าสู่ระบบ</button></form>
-<p id="loginError" class="error" role="alert"></p>
-<div class="links"><button id="usePassword" class="linkbtn" type="button" hidden>ใช้ชื่อผู้ใช้และรหัสผ่านแทน</button><a href="guide.html">คู่มือการใช้งาน</a><a href="?demo=1">ลองโหมดทดลอง</a></div></dialog>
-<dialog id="importDlg" aria-labelledby="importTitle"><div class="row between"><h2 id="importTitle">นำเข้ารายชื่อจากระบบทะเบียน</h2><button id="importClose" class="ghost" type="button" aria-label="ปิด">✕</button></div>
-<p class="muted lead">เลือกไฟล์ .xls “รายชื่อนักศึกษาลงทะเบียน” ที่ดาวน์โหลดจากระบบทะเบียน ระบบจะสร้างรายวิชาให้อัตโนมัติ นำเข้าซ้ำได้ (อัปเดตชื่อ ไม่ลบข้อมูลเดิม) หรือเลือกไฟล์ CSV ที่ดาวน์โหลดจากหน้านี้</p>
-<label class="drop" style="margin-top:14px">เลือกไฟล์ (.xls .xlsx .csv)<input id="importFile" type="file" accept=".xls,.xlsx,.csv,.htm,.html,text/csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"></label>
-<p id="importErr" class="error" role="alert"></p>
-<section id="plan" hidden>
-<div class="fields" id="courseFields"><label>รหัสวิชา<input id="c-code" maxlength="20" placeholder="เช่น 1061101"></label><label>ชื่อวิชา<input id="c-name" maxlength="150"></label>
-<label>ภาคเรียน/ปีการศึกษา<input id="c-term" maxlength="10" placeholder="เช่น 1/2569"></label><label>หมู่เรียน (ถ้าในไฟล์ไม่มี)<input id="c-section" maxlength="10"></label></div>
-<p class="muted" id="courseHint"></p>
-<div class="summary" id="planSummary"></div>
-<div class="plan-rows"><table><thead><tr><th>รหัส</th><th>ชื่อ</th><th>หมู่เรียน</th><th>ผล</th></tr></thead><tbody id="planRows"></tbody></table></div>
-<div class="row between" style="margin-top:16px"><button id="importCancel" type="button">ยกเลิก</button><button id="importGo" class="primary" type="button">นำเข้า</button></div>
-</section></dialog>
-<dialog id="settingsDlg" aria-labelledby="settingsTitle"><div class="row between"><h2 id="settingsTitle">การเข้าถึง</h2><button id="settingsClose" class="ghost" type="button" aria-label="ปิด">✕</button></div>
-<form id="settingsForm">
-<label>อีเมลอาจารย์ (บรรทัดละ 1)<textarea id="s-teachers" rows="3" spellcheck="false" placeholder="teacher@cmru.ac.th"></textarea></label>
-<label>โดเมนอีเมลมหาวิทยาลัยที่นักศึกษาใช้ล็อกอิน เช่น cmru.ac.th (จำเป็น — ว่าง = นักศึกษาเข้าไม่ได้)<textarea id="s-domains" rows="2" spellcheck="false" placeholder="cmru.ac.th"></textarea></label>
-<label>ขนาดไฟล์สูงสุดต่อไฟล์ (MB) สำหรับการส่งงานและหลักฐานใบลา (1–50)<input id="s-maxmb" type="number" min="1" max="50" step="1"></label>
-<label class="check"><input id="s-selfreg" type="checkbox"><span>ให้บัญชีที่ไม่ใช่ &lt;รหัส&gt;@โดเมน สมัครด้วยรหัส + ชื่อ-นามสกุลได้</span></label>
-<p class="muted">ปิดไว้จะปลอดภัยกว่า: ถ้าเปิด ใครที่รู้รหัสและชื่อเพื่อน (เช่น เห็นในรายชื่อกลุ่ม) อาจสมัครแทนเพื่อนก่อนได้ — เปิดเฉพาะช่วงที่จำเป็น แล้วปิดหลังทุกคนสมัครเสร็จ</p>
-<p id="settingsErr" class="error" role="alert"></p>
-<div class="row between"><button id="settingsCancel" type="button">ยกเลิก</button><button id="settingsSave" class="primary" type="submit">บันทึกการตั้งค่า</button></div>
-</form></dialog>
-<div id="toast" role="status" hidden></div>
+<header><div class="wrap"><div class="logo" aria-hidden="true">ศ</div><div><div class="brand">ลูกเทพศิลปศึกษา</div><div class="muted">สาขาศิลปศึกษา มหาวิทยาลัยราชภัฏเชียงใหม่</div></div><a class="guide" href="guide.html">คู่มือการใช้งาน</a></div></header>
+<main class="wrap">
+<section class="intro">
+ <h1>ระบบติดตามนักศึกษา สาขาศิลปศึกษา</h1>
+ <p class="muted">อาจารย์ใช้ติดตามผลการเรียน การเข้าเรียน ภาษาอังกฤษ การสังเกตการสอนและการทดลองสอนของนักศึกษาตลอด 4 ปี นักศึกษาเข้าดูรายวิชาของตัวเองได้ด้วยอีเมลมหาวิทยาลัย</p>
+</section>
+<div class="session" id="session" hidden></div>
+
+<section class="portals" aria-label="เลือกทางเข้าสู่ระบบ">
+ <article class="portal">
+  <div class="who"><span class="badge" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V7l9-4 9 4v14"/><path d="M9 21v-6h6v6"/><path d="M8 10h8"/></svg></span><div><h2>สำหรับอาจารย์</h2><p class="muted">ผู้ดูแลและอาจารย์ประจำวิชา</p></div></div>
+  <ul>
+   <li>ดูภาพรวมและนักศึกษาที่ถึงกำหนดติดตาม</li>
+   <li>นำเข้ารายชื่อจากระบบทะเบียน (.xls) ระบบสร้างรายวิชาให้เอง</li>
+   <li>บันทึกเกรด ภาษาอังกฤษ สังเกตการสอน ทดลองสอน และประวัติการพูดคุย</li>
+   <li>ตั้งค่าการเข้าถึงของอาจารย์และนักศึกษา</li>
+  </ul>
+  <div class="actions"><a class="btn" href="teacher.html">เข้าสู่ระบบอาจารย์</a><a href="guide.html#teacher">คู่มืออาจารย์</a><a href="teacher.html?demo=1">ลองโหมดทดลอง</a></div>
+  <div class="copy">ลิงก์: <code data-link="teacher.html"></code><button type="button" data-copy="teacher.html">คัดลอก</button></div>
+ </article>
+ <article class="portal">
+  <div class="who"><span class="badge" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/><path d="M22 9v6"/></svg></span><div><h2>สำหรับนักศึกษา</h2><p class="muted">ใช้อีเมลมหาวิทยาลัยเข้าสู่ระบบ</p></div></div>
+  <ul>
+   <li>ดูข้อมูลและรายวิชาที่ลงทะเบียนของตัวเอง</li>
+   <li>กำลังจะเปิดให้ใช้: ส่งงาน เช็คชื่อด้วย QR ใบลา และดูคะแนน</li>
+  </ul>
+  <div class="actions"><a class="btn" href="student.html">เข้าสู่ระบบนักศึกษา</a><a href="guide.html#student">คู่มือนักศึกษา</a></div>
+  <div class="copy">ลิงก์สำหรับส่งให้นักศึกษา: <code data-link="student.html"></code><button type="button" data-copy="student.html">คัดลอก</button></div>
+ </article>
+</section>
+
+<section class="howto" aria-label="วิธีใช้งานโดยย่อ">
+ <section>
+  <h3>อาจารย์: เริ่มต้นใช้งาน</h3>
+  <ol>
+   <li>เข้าสู่ระบบด้วย Google ที่ <a href="teacher.html">หน้าอาจารย์</a></li>
+   <li>กด <b>ตั้งค่า</b> ใส่อีเมลอาจารย์ท่านอื่น และโดเมนอีเมลนักศึกษา เช่น <code>g.cmru.ac.th</code></li>
+   <li>กด <b>นำเข้าข้อมูล</b> แล้วเลือกไฟล์รายชื่อนักศึกษาลงทะเบียนจากระบบทะเบียน</li>
+   <li>ส่งลิงก์หน้านักศึกษาให้นักศึกษาในรายวิชา</li>
+   <li>กด <b>เปิดประวัติ</b> ที่แถวนักศึกษาเพื่อบันทึกข้อมูลและการติดตาม</li>
+  </ol>
+ </section>
+ <section>
+  <h3>นักศึกษา: เข้าสู่ระบบครั้งแรก</h3>
+  <ol>
+   <li>เปิด <a href="student.html">หน้านักศึกษา</a></li>
+   <li>กด <b>ลงชื่อเข้าใช้ด้วย Google</b> แล้วเลือกอีเมลมหาวิทยาลัย</li>
+   <li>ระบบจับคู่รหัสนักศึกษากับรายชื่อให้เอง ถ้าระบบให้กรอกรหัสและชื่อ ให้กรอกตรงกับทะเบียน</li>
+   <li>เข้าไม่ได้ ให้แจ้งอาจารย์ประจำวิชาให้นำเข้ารายชื่อก่อน</li>
+  </ol>
+ </section>
+</section>
+
+<div class="note">
+ <h3>ข้อมูลส่วนบุคคล</h3>
+ <p class="muted">ข้อมูลนักศึกษาเก็บใน Google Sheets ของสาขาเท่านั้น ไม่ได้อยู่ในหน้าเว็บหรือใน GitHub ทุกการเปิดดูต้องเข้าสู่ระบบ และนักศึกษาเห็นเฉพาะข้อมูลของตัวเอง</p>
+</div>
+
+<footer><a href="guide.html">คู่มือการใช้งาน</a><a href="teacher.html?demo=1">โหมดทดลอง</a><span>มหาวิทยาลัยราชภัฏเชียงใหม่</span></footer>
+</main>
 <script>
-/* ใส่ URL ของ Google Apps Script Web App (ลงท้ายด้วย /exec) เพื่อเก็บข้อมูลใน Google Sheets ว่างไว้ = เก็บในเบราว์เซอร์ */
-const SHEETS_API = '';
-/* Client ID ของ Google Sign-In (ลงท้ายด้วย .apps.googleusercontent.com) ว่างไว้ = ใช้ชื่อผู้ใช้และรหัสผ่าน */
-const GOOGLE_CLIENT_ID = '';
-const $ = id => document.getElementById(id);
-const statuses = {normal:'ปกติ',watch:'เฝ้าระวัง',active:'กำลังติดตาม',done:'ติดตามแล้ว'};
-const stages = {none:'ยังไม่เริ่ม',doing:'กำลังดำเนินการ',pass:'ผ่าน',fail:'ไม่ผ่าน'};
-const stagePill = {none:'none',doing:'watch',pass:'normal',fail:'active'};
-const CEFR = ['A1','A2','B1','B2','C1','C2'];
-const FIELDS = {id:'รหัสนักศึกษา',name:'ชื่อ–นามสกุล',year:'ชั้นปี',term:'เทอม',school:'โรงเรียนที่จบมา',gpa:'เกรดเฉลี่ยเดิม',gpaNow:'เกรดเฉลี่ยปัจจุบัน',englishScore:'คะแนนภาษาอังกฤษ',englishLevel:'ระดับภาษาอังกฤษ (CEFR)',attendance:'เข้าเรียน (%)',observe:'สังเกตการสอน',practice:'ทดลองสอน',status:'สถานะติดตาม',due:'นัดติดตามครั้งถัดไป',contact:'ช่องทางติดต่อ',advisor:'ผู้รับผิดชอบ',issue:'ประเด็นติดตาม'};
-const TZ = 'Asia/Bangkok';
-const today = () => new Intl.DateTimeFormat('en-CA',{timeZone:TZ}).format(new Date());
-const date = value => value ? new Intl.DateTimeFormat('th-TH',{dateStyle:'medium',timeZone:TZ}).format(new Date(value)) : '—';
-const stamp = value => new Intl.DateTimeFormat('th-TH',{dateStyle:'medium',timeStyle:'short',timeZone:TZ}).format(new Date(value));
-const KEY = 'lukthep-student-records-v1', THEME_KEY = 'lukthep-theme';
-const inViewer = typeof window.claude?.use === 'function';
-const demoMode = !inViewer && new URLSearchParams(location.search).has('demo');
-const useSheets = !inViewer && !demoMode && !!SHEETS_API;
-const SESSION_KEY = 'lukthep-session';
-
-/* ---------- data shape ---------- */
-const str = (v,max=2000) => (v==null?'':String(v)).trim().slice(0,max);
-function num(v,min,max,int){
- if(v===''||v==null) return '';
- const n=Number(String(v).replace('%','').trim());
- if(!Number.isFinite(n)||n<min||(max!=null&&n>max)) return '';
- return int?Math.round(n):n;
-}
-function isoDate(v){
- v=str(v);
- if(/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
- const m=v.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/); // วว/ดด/ปปปป (รองรับ พ.ศ.)
- if(!m) return '';
- let y=+m[3]; if(y>2400) y-=543;
- const d=new Date(Date.UTC(y,+m[2]-1,+m[1]));
- return d.getUTCDate()===+m[1]&&d.getUTCMonth()===+m[2]-1?d.toISOString().slice(0,10):'';
-}
-function clean(r){
- r=r&&typeof r==='object'?r:{};
- return {id:str(r.id,30),name:str(r.name,120),school:str(r.school,150),gpa:num(r.gpa,0,4),gpaNow:num(r.gpaNow,0,4),englishScore:num(r.englishScore,0,100),englishLevel:CEFR.includes(str(r.englishLevel).toUpperCase())?str(r.englishLevel).toUpperCase():'',attendance:num(r.attendance,0,100),
-  year:[1,2,3,4].includes(+r.year)?+r.year:'',term:[1,2].includes(+r.term)?+r.term:'',observe:stages[r.observe]?r.observe:'none',practice:stages[r.practice]?r.practice:'none',status:statuses[r.status]?r.status:'normal',due:isoDate(r.due),
-  issue:str(r.issue,200),contact:str(r.contact,150),advisor:str(r.advisor,120),
-  notes:Array.isArray(r.notes)?r.notes.filter(n=>n&&typeof n.text==='string'&&n.at).map(n=>({at:String(n.at),text:n.text.slice(0,2000),...(n.by?{by:String(n.by)}:{}),...(n.byName?{byName:String(n.byName)}:{})})):[],
-  enroll:Array.isArray(r.enroll)?r.enroll.filter(e=>e&&e.code).slice(0,60).map(e=>({code:str(e.code,20),name:str(e.name,150),term:str(e.term,10),section:str(e.section,10)})):[],
-  hasAccount:!!r.hasAccount,demo:!!r.demo};
-}
-const examples = [
- ['ตัวอย่าง 01','กานต์ ธาราศิลป์',4,1,'โรงเรียนศิลป์ศึกษา',3.45,3.52,95,'pass','doing','normal'],
- ['ตัวอย่าง 02','พิมพ์ชนก แสงดาว',2,1,'โรงเรียนเมืองวิทยา',2.78,2.31,67,'none','none','active'],
- ['ตัวอย่าง 03','ธนกฤต วาดฝัน',3,1,'โรงเรียนเทศบาลวิทยา',3.12,2.88,76,'doing','none','watch'],
- ['ตัวอย่าง 04','ศิรินภา พูนศิลป์',4,1,'โรงเรียนศิลป์ศึกษา',3.80,3.71,100,'pass','pass','normal'],
- ['ตัวอย่าง 05','ภาคิน จันทร์ทอง',1,2,'โรงเรียนชุมชนศึกษา',3.28,3.10,90,'none','none','done'],
- ['ตัวอย่าง 06','ณัฐธิดา มีแสง',3,1,'โรงเรียนเมืองวิทยา',2.96,2.64,75,'fail','none','watch']
-].map(([id,name,year,term,school,gpa,gpaNow,attendance,observe,practice,status])=>clean({id,name,year,term,school,gpa,gpaNow,attendance,observe,practice,status,due:status==='active'?today():'',issue:status==='active'?'เข้าเรียนต่ำกว่า 80% และเกรดเฉลี่ยลดลง':'',demo:true}));
-
-/* ---------- storage: browser (default) or shared db (published artifact) ---------- */
-const local = {
- load(){
-  if(demoMode)return examples.map(r=>({...r}));
-  try{const raw=JSON.parse(localStorage.getItem(KEY));return Array.isArray(raw)?raw.map(clean).filter(r=>r.id&&r.name):examples;}
-  catch{return examples;}
- },
- write(next){if(demoMode){records=next;render();return;}localStorage.setItem(KEY,JSON.stringify(next.map(({_doc,...r})=>r)));records=next;render();}
+const base=location.href.replace(/[#?].*$/,'').replace(/[^/]*$/,'');
+for(const el of document.querySelectorAll('[data-link]'))el.textContent=base+el.dataset.link;
+for(const btn of document.querySelectorAll('[data-copy]'))btn.onclick=async()=>{
+ const text=base+btn.dataset.copy;
+ try{await navigator.clipboard.writeText(text);btn.textContent='คัดลอกแล้ว';}
+ catch{const code=btn.previousElementSibling,r=document.createRange();r.selectNodeContents(code);const s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='กด Ctrl+C';}
+ setTimeout(()=>btn.textContent='คัดลอก',2000);
 };
-async function api(action,payload={}){
- const ctrl=new AbortController(),t=setTimeout(()=>ctrl.abort(),45000);
- let data;
- try{
-  const res=await fetch(SHEETS_API,{method:'POST',body:JSON.stringify({action,token:store.session?.token,...payload}),signal:ctrl.signal});
-  data=await res.json();
- }catch{throw Object.assign(new Error('เชื่อมต่อ Google Sheets ไม่ได้ โปรดตรวจสอบอินเทอร์เน็ตแล้วลองอีกครั้ง'),{code:'network'});}
- finally{clearTimeout(t);}
- if(!data?.ok)throw Object.assign(new Error(data?.message||'เกิดข้อผิดพลาด'),{code:data?.code||'server_error'});
- return data;
-}
-const forServer = ({_doc,notes,hasAccount,...r}) => r;
-function fromServer(data){records=(data.students??[]).map(clean).filter(r=>r.id&&r.name);loading=false;loadProblem='';render();}
-const store = {
- mode:'local', db:null, user:null, me:null, canWrite:true, session:null,
- async upsert(prev,next,note){
-  if(this.mode==='sheets'){fromServer(await api('saveStudent',{prevId:prev?.id??null,student:forServer(next),note:note?.text??''}));return;}
-  next={...next,notes:[...await this.latestNotes(prev),...(note?[note]:[])]};
-  if(this.mode==='local'){local.write(prev?records.map(r=>r===prev?next:r):[...records,next]);return;}
-  const col=this.db.collection('students');
-  const {_doc,...body}=next;
-  await (prev?._doc?col.doc(prev._doc):col.doc()).set(body);
- },
- async remove(list){
-  if(this.mode==='sheets'){fromServer(await api('deleteStudents',{ids:list.map(r=>r.id)}));return;}
-  if(this.mode==='local'){local.write(records.filter(r=>!list.includes(r)));return;}
-  for(const r of list) await this.db.collection('students').doc(r._doc).delete();
- },
- async many(pairs){ // [[prev|null,next],...]
-  if(this.mode==='sheets'){fromServer(await api('importStudents',{rows:pairs.map(([prev,rec])=>({prevId:prev?.id??null,student:forServer(rec)}))}));return;}
-  if(this.mode==='local'){
-   let next=[...records];
-   for(const [prev,rec] of pairs) next=prev?next.map(r=>r===prev?rec:r):[...next,rec];
-   local.write(next);return;
-  }
-  for(const [prev,rec] of pairs){const {_doc,...body}=rec;await this.db.collection('students').doc(prev?._doc||undefined).set(body);}
- },
- async latestNotes(record){
-  if(this.mode!=='db'||!record?._doc) return record?.notes??[];
-  const snap=await this.db.collection('students').doc(record._doc).get();
-  return snap.exists?clean(snap.data()).notes:(record.notes??[]);
+try{
+ const t=localStorage.getItem('lukthep-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;
+ const s=JSON.parse(localStorage.getItem('lukthep-session'));
+ if(s&&s.token&&s.name){
+  const box=document.getElementById('session'),a=document.createElement('a');
+  box.textContent='คุณเข้าสู่ระบบอยู่ในชื่อ '+s.name+' · ';
+  a.href=s.role==='student'?'student.html':'teacher.html';a.textContent='ไปที่ระบบ →';a.style.color='inherit';
+  box.append(a);box.hidden=false;
  }
-};
-let records = inViewer||useSheets ? [] : local.load();
-let loading = inViewer||useSheets, loadProblem = '';
-let editing = null, timer;
-const form = $('form');
-for(const [value,label] of Object.entries(stages)){form.elements.observe.add(new Option(label,value));form.elements.practice.add(new Option(label,value));}
-for(const y of [1,2,3,4])$('yearFilter').add(new Option('ปี '+y,y));
-for(const [value,label] of Object.entries(statuses)){
- $('filter').add(new Option(label,value));
- form.elements.status.add(new Option(label,value));
-}
-
-/* ---------- rendering ---------- */
-function node(tag,value,cls){
- const element=document.createElement(tag);
- if(value!==undefined) element.textContent=value;
- if(cls) element.className=cls;
- return element;
-}
-function due(record){return !!record.due&&record.due<=today()&&['watch','active'].includes(record.status);}
-function visible(){
- const query=$('search').value.trim().toLocaleLowerCase('th');
- const status=$('filter').value,year=$('yearFilter').value,course=$('courseFilter').value;
- return records
-  .filter(r=>(!status||r.status===status)&&(!course||r.enroll.some(e=>courseKey(e)===course))&&(!year||String(r.year)===year)&&[r.id,r.name,r.school].some(v=>String(v??'').toLocaleLowerCase('th').includes(query)))
-  .sort((a,b)=>due(b)-due(a)||String(a.id).localeCompare(String(b.id),'th',{numeric:true}));
-}
-const blank = v => v===''||v==null;
-function render(){
- const shown=visible();
- const att=records.filter(r=>!blank(r.attendance));
- const average=att.length?Math.round(att.reduce((s,r)=>s+Number(r.attendance),0)/att.length)+'%':'—';
- const upcoming=records.filter(due).length;
- const demo=records.filter(r=>r.demo).length;
- let text;
- if(loading) text='กำลังโหลดข้อมูล…';
- else if(loadProblem) text=loadProblem;
- else text=(demo?'มีข้อมูลตัวอย่าง '+demo+' รายการ · ':'')+(upcoming?'ถึงกำหนดติดตาม '+upcoming+' คน':'ไม่มีนัดติดตามที่ถึงกำหนด');
- $('alert').textContent=text;
- $('notice').classList.toggle('bad',!!loadProblem);
- $('clearDemo').hidden=!demo||!store.canWrite;
- $('stats').replaceChildren(...[
-  ['นักศึกษาทั้งหมด',records.length],['เฝ้าระวัง',records.filter(r=>r.status==='watch').length],['กำลังติดตาม',records.filter(r=>r.status==='active').length],['เข้าเรียนเฉลี่ย',average]
- ].map(([label,value])=>{const card=node('div',undefined,'card');card.append(node('div',label,'muted'),node('strong',loading?'—':value));return card;}));
- $('rows').replaceChildren(...shown.map(record=>{
-  const tr=node('tr');
-  const td=node('td'),person=node('div',undefined,'person'),details=node('div');
-  details.append(node('strong',record.name));
-  tr.append(node('td',record.id,'sid'));
-  person.append(node('span',[...record.name.replace(/^(นาย|นางสาว|นาง|น\.ส\.|ด\.ช\.|ด\.ญ\.)\s*/,'')][0]??'?','avatar'),details);
-  td.append(person);tr.append(td);
-  const level=(record.year?'ปี '+record.year:'')+(record.year&&record.term?' · ':'')+(record.term?'เทอม '+record.term:'');
-  const gpa=v=>blank(v)?'':Number(v).toFixed(2);
-  const eng=[record.englishLevel,blank(record.englishScore)?'':record.englishScore+' คะแนน'].filter(Boolean).join(' · ');
-  const course=$('courseFilter').value, en=record.enroll.find(e=>courseKey(e)===course)??record.enroll[0];
-  const cc=node('td',en?en.code+(en.section?' · หมู่ '+en.section:''):'—');
-  if(record.enroll.length>1){cc.append(node('small','+ อีก '+(record.enroll.length-1)+' วิชา'));}
-  cc.title=record.enroll.map(e=>e.code+' '+e.name+(e.term?' ('+e.term+')':'')+(e.section?' หมู่ '+e.section:'')).join('\n');
-  tr.append(cc);
-  for(const value of [level,record.school,gpa(record.gpa),gpa(record.gpaNow),eng,blank(record.attendance)?'':record.attendance+'%'])
-   tr.append(node('td',blank(value)?'—':String(value)));
-  for(const k of ['observe','practice']){const c=node('td');c.append(node('span',stages[record[k]],'pill '+stagePill[record[k]]));tr.append(c);}
-  const status=node('td');
-  status.append(node('span',statuses[record.status],'pill '+record.status));
-  if(record.issue)status.append(node('small',record.issue));
-  const action=node('td'),button=node('button','เปิดประวัติ');
-  button.type='button';
-  button.addEventListener('click',()=>open(record));
-  action.append(button);
-  tr.append(status,node('td',date(record.due),due(record)?'overdue':''),action);
-  return tr;
- }));
- if(!shown.length){
-  const row=node('tr'),cell=node('td',loading?'กำลังโหลดรายชื่อนักศึกษา…':records.length?'ไม่พบข้อมูลนักศึกษาที่ตรงกับการค้นหา':'ยังไม่มีข้อมูลนักศึกษา · กด “เพิ่มนักศึกษา” หรือ “นำเข้า CSV” เพื่อเริ่มต้น','muted');
-  cell.colSpan=14;row.append(cell);$('rows').append(row);
- }
- $('count').textContent='แสดง '+shown.length+' จาก '+records.length+' คน';
- $('acctChip').hidden=store.mode!=='sheets'||!records.length;
- $('acctChip').textContent='สมัครแล้ว '+records.filter(r=>r.hasAccount).length+'/'+records.length;
- for(const id of ['add','importOpen'])$(id).hidden=!store.canWrite;
- renderCourseFilter();
-}
-function toast(message){
- $('toast').textContent=message;$('toast').hidden=false;
- clearTimeout(timer);timer=setTimeout(()=>$('toast').hidden=true,2800);
-}
-function ask(message,yes,danger){
- return new Promise(resolve=>{
-  const d=$('confirm');
-  $('confirmText').textContent=message;
-  $('confirmYes').textContent=yes;
-  $('confirmYes').className=danger?'danger solid':'primary';
-  const done=v=>{d.close();resolve(v);};
-  $('confirmYes').onclick=()=>done(true);
-  $('confirmNo').onclick=()=>done(false);
-  d.oncancel=e=>{e.preventDefault();done(false);};
-  d.showModal();
- });
-}
-async function open(record){
- editing=record??null;
- form.reset();
- $('error').textContent='';
- $('dialogTitle').textContent=record?'ประวัตินักศึกษา':'เพิ่มนักศึกษา';
- $('remove').hidden=!record||!store.canWrite;
- $('submit').hidden=!store.canWrite;
- for(const field of form.elements){
-  if(!field.name)continue;
-  if(record&&field.name!=='note')field.value=record[field.name]??'';
-  field.disabled=!store.canWrite;
- }
- const list=$('history'),notes=record?.notes??[];
- list.replaceChildren();
- if(record?.enroll.length){
-  list.append(node('h2','รายวิชาที่ลงทะเบียน'));
-  for(const e of record.enroll)list.append(node('p',e.code+' '+e.name+(e.term?' · ภาคเรียน '+e.term:'')+(e.section?' · หมู่ '+e.section:'')));
- }
- list.append(node('h2','ประวัติการติดตาม'));
- if(!notes.length)list.append(node('p','ยังไม่มีบันทึก','muted'));
- const authors=[];
- for(const entry of [...notes].reverse()){
-  const meta=node('small',stamp(entry.at));
-  if(entry.byName)meta.append(' · '+entry.byName);
-  else if(entry.by){const who=node('span');who.dataset.user=entry.by;meta.append(' · ',who);authors.push(entry.by);}
-  list.append(meta,node('p',entry.text));
- }
- $('editor').showModal();
- if(authors.length&&store.user){
-  try{
-   const ps=await store.user.profiles([...new Set(authors)]);
-   for(const el of list.querySelectorAll('[data-user]'))el.textContent=ps[el.dataset.user]?.name||'ผู้ใช้คนอื่น';
-  }catch{}
- }
-}
-function writeFailed(e){
- if(store.mode==='sheets'){
-  if(e?.code==='auth'){showLogin(true);return 'หมดเวลาเข้าสู่ระบบ โปรดเข้าสู่ระบบอีกครั้งแล้วบันทึกใหม่';}
-  return e?.message||'บันทึกไม่สำเร็จ';
- }
- if(e?.code==='invalid_argument'&&store.mode==='db'){store.canWrite=false;render();return 'คุณมีสิทธิ์ดูข้อมูลอย่างเดียว จึงบันทึกการเปลี่ยนแปลงไม่ได้';}
- if(e?.code==='quota_exceeded')return 'พื้นที่เก็บข้อมูลเต็ม โปรดลบข้อมูลที่ไม่ใช้แล้วก่อน';
- if(store.mode==='local')return 'บันทึกไม่สำเร็จ โปรดตรวจสอบพื้นที่จัดเก็บของเบราว์เซอร์';
- return 'บันทึกไม่สำเร็จ โปรดตรวจสอบการเชื่อมต่อแล้วลองอีกครั้ง';
-}
-
-/* ---------- actions ---------- */
-form.addEventListener('submit',async event=>{
- event.preventDefault();
- if(!store.canWrite)return;
- const values=Object.fromEntries([...new FormData(form)].map(([f,v])=>[f,String(v).trim()]));
- if(!values.id||!values.name){$('error').textContent='กรุณาระบุรหัสและชื่อนักศึกษา';return;}
- if(records.some(r=>r!==editing&&r.id===values.id)){$('error').textContent='รหัสนักศึกษานี้มีอยู่แล้ว';return;}
- const {note,...fields}=values;
- $('submit').disabled=true;
- try{
-  const entry=note?{at:new Date().toISOString(),text:note,...(store.me?{by:store.me}:{})}:null;
-  const next={...clean({...fields,notes:editing?.notes??[],demo:editing?.demo??false}),...(editing?._doc?{_doc:editing._doc}:{})};
-  await store.upsert(editing,next,entry);
-  $('editor').close();toast('บันทึกข้อมูลแล้ว');
- }catch(e){$('error').textContent=writeFailed(e);}
- finally{$('submit').disabled=false;}
-});
-$('remove').onclick=async()=>{
- if(!editing||!await ask('ลบข้อมูลและประวัติการติดตามทั้งหมดของ '+editing.name+'?\nการลบนี้ย้อนกลับไม่ได้','ลบข้อมูล',true))return;
- try{await store.remove([editing]);$('editor').close();toast('ลบข้อมูลแล้ว');}
- catch(e){$('error').textContent=writeFailed(e);}
-};
-$('clearDemo').onclick=async()=>{
- const demo=records.filter(r=>r.demo);
- if(!demo.length||!await ask('ลบข้อมูลตัวอย่าง '+demo.length+' รายการ? ข้อมูลนักศึกษาจริงจะไม่ถูกลบ','ลบข้อมูลตัวอย่าง',true))return;
- try{await store.remove(demo);toast('ลบข้อมูลตัวอย่างแล้ว');}catch(e){toast(writeFailed(e));}
-};
-$('add').onclick=()=>open();
-$('close').onclick=()=>$('editor').close();
-$('search').oninput=render;
-$('filter').onchange=render;
-$('yearFilter').onchange=render;
-$('courseFilter').onchange=render;
-
-/* ---------- CSV ---------- */
-function csvText(){
- const quote=value=>{const s=String(value??'');return '"'+(/^[=+@\-\r\n\t]/.test(s)?"'":'')+s.replaceAll('"','""')+'"';};
- const enrollText=r=>r.enroll.map(e=>[e.code,e.name,e.term&&'('+e.term+')',e.section&&'หมู่ '+e.section].filter(Boolean).join(' ')).join('; ');
- const lines=[[...Object.values(FIELDS),'รายวิชา'],...visible().map(r=>[...Object.keys(FIELDS).map(f=>f==='status'?statuses[r.status]:f==='observe'||f==='practice'?stages[r[f]]:r[f]),enrollText(r)])];
- return '﻿'+lines.map(row=>row.map(quote).join(',')).join('\r\n');
-}
-$('export').onclick=async()=>{
- const filename='ลูกเทพศิลปศึกษา-'+today()+'.csv', data=csvText();
- if(inViewer){
-  const dl=await claude.use('downloads');
-  if(!dl){toast('ดาวน์โหลดไฟล์ไม่ได้ในมุมมองนี้');return;}
-  try{await dl.save({filename,data});}
-  catch(e){if(e?.code==='rate_limited')toast('มีหน้าต่างดาวน์โหลดเปิดอยู่แล้ว');else if(e?.code!=='declined')toast('ดาวน์โหลดไม่สำเร็จ');}
-  return;
- }
- const url=URL.createObjectURL(new Blob([data],{type:'text/csv;charset=utf-8'}));
- const link=node('a');link.href=url;link.download=filename;document.body.append(link);link.click();link.remove();
- setTimeout(()=>URL.revokeObjectURL(url),1000);
-};
-function parseCSV(text){
- text=text.replace(/^﻿/,'');
- const rows=[];let row=[],field='',q=false;
- for(let i=0;i<text.length;i++){
-  const c=text[i];
-  if(q){if(c==='"'){if(text[i+1]==='"'){field+='"';i++;}else q=false;}else field+=c;}
-  else if(c==='"')q=true;
-  else if(c===','){row.push(field);field='';}
-  else if(c==='\n'||c==='\r'){if(c==='\r'&&text[i+1]==='\n')i++;row.push(field);rows.push(row);row=[];field='';}
-  else field+=c;
- }
- if(field||row.length){row.push(field);rows.push(row);}
- return rows.filter(r=>r.some(v=>v.trim()));
-}
-const unguard = v => String(v).replace(/^'(?=[=+@\-\t\r\n])/,'');
-const headerMap = Object.fromEntries(Object.entries(FIELDS).flatMap(([k,label])=>[[k.toLowerCase(),k],[label,k]]).concat([['ผู้รับผิดชอบติดตาม','advisor'],['ปี','year'],['ชั้นปีที่','year'],['ภาคเรียน','term'],['เกรดเฉลี่ย','gpaNow'],['ภาษาอังกฤษ','englishLevel'],['CEFR','englishLevel'],['ระดับภาษาอังกฤษ','englishLevel'],['คะแนนสอบภาษาอังกฤษ','englishScore'],['GPA','gpaNow'],['gpax','gpaNow'],['ประเด็นที่ติดตาม','issue'],['ชื่อ-นามสกุล','name']]));
-const statusMap = Object.fromEntries(Object.entries(statuses).flatMap(([k,label])=>[[k,k],[label,k]]));
-const stageMap = Object.fromEntries(Object.entries(stages).flatMap(([k,label])=>[[k,k],[label,k]]));
-/* ---------- import: registration .xls/.xlsx (incl. HTML-as-.xls) or this page's CSV ---------- */
-const courseKey = e => e.code+'|'+e.term;
-function renderCourseFilter(){
- const sel=$('courseFilter'),cur=sel.value,seen=new Map();
- for(const r of records)for(const e of r.enroll)if(!seen.has(courseKey(e)))seen.set(courseKey(e),e);
- sel.hidden=!seen.size;
- const opts=[...seen.entries()].sort((a,b)=>a[1].code.localeCompare(b[1].code)).map(([k,e])=>new Option(e.code+' '+e.name+(e.term?' ('+e.term+')':''),k));
- sel.replaceChildren(new Option('ทุกรายวิชา',''),...opts);
- sel.value=seen.has(cur)?cur:'';
-}
-let XLSXlib=null;
-function loadXLSX(){
- if(XLSXlib)return XLSXlib;
- return XLSXlib=new Promise((ok,bad)=>{
-  const sc=document.createElement('script');
-  sc.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
-  sc.onload=()=>ok(window.XLSX);sc.onerror=()=>{XLSXlib=null;bad(new Error('โหลดตัวอ่านไฟล์ Excel ไม่ได้ โปรดตรวจสอบอินเทอร์เน็ต'));};
-  document.head.append(sc);
- });
-}
-function decodeText(buf){
- const head=new TextDecoder('latin1').decode(buf.slice(0,3000)).toLowerCase();
- const meta=head.match(/charset\s*=\s*["']?([\w-]+)/);
- if(meta&&/874|tis|620/.test(meta[1]))return new TextDecoder('windows-874').decode(buf);
- const utf=new TextDecoder('utf-8').decode(buf);
- return (utf.match(/\uFFFD/g)||[]).length>3?new TextDecoder('windows-874').decode(buf):utf;
-}
-const cellText = v => String(v??'').replace(/ /g,' ').replace(/\s+/g,' ').trim();
-async function readGrid(file){
- const buf=await file.arrayBuffer();
- const bytes=new Uint8Array(buf.slice(0,8));
- const isZip=bytes[0]===0x50&&bytes[1]===0x4b, isOle=bytes[0]===0xd0&&bytes[1]===0xcf;
- if(!isZip&&!isOle){
-  const text=decodeText(buf);
-  if(/<table/i.test(text)){ // many registration systems export an HTML table named .xls
-   const doc=new DOMParser().parseFromString(text,'text/html');
-   const rows=[...doc.querySelectorAll('tr')].map(tr=>[...tr.cells].map(c=>cellText(c.textContent)));
-   return {rows,text:cellText(doc.body?.textContent)};
-  }
-  const rows=parseCSV(text).map(r=>r.map(cellText));
-  return {rows,text:rows.slice(0,15).map(r=>r.join(' ')).join(' ')};
- }
- const X=await loadXLSX();
- const wb=X.read(buf,{type:'array'});
- const rows=[];
- for(const name of wb.SheetNames)rows.push(...X.utils.sheet_to_json(wb.Sheets[name],{header:1,raw:false,defval:''}).map(r=>r.map(cellText)));
- return {rows,text:rows.slice(0,15).map(r=>r.join(' ')).join(' ')};
-}
-const digits = v => cellText(v).replace(/[\s-]/g,'');
-function guessYear(id){ // 65xxxxxxxx = เข้าปีการศึกษา 2565
- const m=/^(\d{2})\d{6,}$/.exec(id); if(!m)return '';
- const now=new Date(),ce=now.getFullYear()-(now.getMonth()<5?1:0),acad=ce+543;
- const y=acad-(2500+Number(m[1]))+1;
- return y>=1&&y<=4?y:'';
-}
-function detectCourse(text,fileName){
- const t=text.slice(0,4000), c={code:'',name:'',term:'',section:''};
- let m=t.match(/(?:รหัสวิชา|วิชา)\s*[:：]?\s*([A-Z]{0,4}\s?\d{4,8}(?:-\d{2,4})?)\s*(?:ชื่อวิชา\s*[:：]?)?\s*([^\d:：]{3,80}?)(?=\s+(?:\(?\d\s*\(|หน่วยกิต|ภาค|หมู่|กลุ่ม|ผู้สอน|อาจารย์|จำนวน|ลำดับ|$))/i);
- if(m){c.code=m[1].replace(/\s/g,'');c.name=cellText(m[2]).replace(/^[-–:]\s*/,'');}
- if(!c.name){m=t.match(/ชื่อวิชา\s*[:：]?\s*(.{3,80}?)(?=\s+(?:หน่วยกิต|ภาค|หมู่|กลุ่ม|ผู้สอน|อาจารย์|จำนวน|$))/);if(m)c.name=cellText(m[1]);}
- if(!c.code){m=(fileName+' '+t).match(/\b(\d{7})\b/);if(m)c.code=m[1];}
- m=t.match(/(?:ภาค(?:การศึกษา|เรียน)(?:ที่)?|เทอม)\s*[:：]?\s*([123])\s*(?:\/|ปีการศึกษา|ปี)\s*(25\d\d)/)||t.match(/\b([123])\s*\/\s*(25\d\d)\b/);
- if(m)c.term=m[1]+'/'+m[2];
- m=t.match(/(?:หมู่เรียน|หมู่|กลุ่มเรียน|กลุ่ม|section|sec\.?)\s*[:：]?\s*([A-Za-z0-9ก-ฮ]{1,6})\b/i);
- if(m)c.section=m[1];
- return c;
-}
-function findHeader(rows){
- for(let i=0;i<Math.min(rows.length,60);i++){
-  const row=rows[i].map(v=>v.toLowerCase());
-  const id=row.findIndex(v=>/รหัส(นักศึกษา|นศ|ประจำตัว)?|student\s*id|^id$/.test(v)&&!/วิชา/.test(v));
-  const name=row.findIndex(v=>/ชื่อ|name/.test(v)&&!/วิชา|ผู้สอน/.test(v));
-  if(id>=0&&name>=0)return i;
- }
- return -1;
-}
-function planRegistration(rows,text,fileName){
- const h=findHeader(rows);
- if(h<0)throw new Error('ไม่พบหัวตารางที่มีคอลัมน์ “รหัส” และ “ชื่อ” ในไฟล์นี้ โปรดตรวจว่าเป็นไฟล์รายชื่อนักศึกษาลงทะเบียน');
- const head=rows[h].map(v=>v.toLowerCase());
- const find=re=>head.findIndex(v=>re.test(v));
- const col={
-  id:head.findIndex(v=>/รหัส(นักศึกษา|นศ|ประจำตัว)?|student\s*id|^id$/.test(v)&&!/วิชา/.test(v)),
-  prefix:find(/คำนำหน้า|prefix|title/),
-  first:find(/^ชื่อ$|ชื่อจริง|first/),
-  last:find(/^นามสกุล|^สกุล|last|surname/),
-  full:find(/ชื่อ\s*[-–]?\s*(นาม)?สกุล|ชื่อ\s*[-–]\s*สกุล|full\s*name|^name$/),
-  section:find(/หมู่|กลุ่ม|section|^sec/),
-  phone:find(/โทร|เบอร์|phone|mobile/),
-  email:find(/อีเมล|e-?mail/)
- };
- if(col.full<0&&col.first<0)col.full=head.findIndex(v=>/ชื่อ|name/.test(v)&&!/วิชา|ผู้สอน/.test(v));
- const people=[],seen=new Set();let skipped=0;
- for(const row of rows.slice(h+1)){
-  const id=digits(row[col.id]);
-  if(!/^\d{5,15}$/.test(id)){if(row.some(Boolean))skipped++;continue;}
-  if(seen.has(id)){skipped++;continue;}
-  const prefix=col.prefix>=0?cellText(row[col.prefix]):''; // คำนำหน้าติดกับชื่อแบบไทย เช่น นายกานต์
-  const base=col.full>=0&&row[col.full]?cellText(row[col.full]):cellText([row[col.first],col.last>=0?row[col.last]:''].join(' '));
-  const name=prefix&&!base.startsWith(prefix)?prefix+base:base;
-  if(!name){skipped++;continue;}
-  seen.add(id);
-  people.push({id,name,section:col.section>=0?cellText(row[col.section]):'',contact:[col.phone>=0?row[col.phone]:'',col.email>=0?row[col.email]:''].map(cellText).filter(Boolean).join(' · ')});
- }
- if(!people.length)throw new Error('ไม่พบรายชื่อนักศึกษาในไฟล์ (รหัสนักศึกษาต้องเป็นตัวเลข)');
- return {kind:'reg',people,skipped,course:detectCourse(text,fileName)};
-}
-function planCSV(rows){
- const cols=rows[0].map(h=>headerMap[h.trim()]??headerMap[h.trim().toLowerCase()]);
- if(!cols.includes('id')||!cols.includes('name'))return null;
- const raws=[],seen=new Set();let skipped=0;
- for(const row of rows.slice(1)){
-  const raw={};
-  cols.forEach((k,i)=>{if(k&&row[i]!=null)raw[k]=unguard(row[i]).trim();});
-  if(raw.status)raw.status=statusMap[raw.status]??statusMap[raw.status.toLowerCase()]??'normal';
-  for(const k of ['observe','practice'])if(raw[k])raw[k]=stageMap[raw[k]]??stageMap[raw[k].toLowerCase()]??'none';
-  for(const k of ['year','term'])if(raw[k])raw[k]=raw[k].replace(/^(ปี|ชั้นปีที่|เทอม|ภาคเรียนที่)\s*/,'');
-  const rec=clean(raw);
-  if(!rec.id||!rec.name||seen.has(rec.id)){skipped++;continue;}
-  seen.add(rec.id);raws.push([raw,rec]);
- }
- if(!raws.length)throw new Error('ไม่มีแถวที่นำเข้าได้ ทุกแถวต้องมีรหัสและชื่อนักศึกษา');
- return {kind:'csv',raws,skipped};
-}
-function buildPairs(plan){ // -> [[prev|null,next,result]]
- const byId=new Map(records.map(r=>[r.id,r]));
- if(plan.kind==='csv')return plan.raws.map(([raw,rec])=>{
-  const prev=byId.get(rec.id);
-  if(!prev)return [null,rec,'new'];
-  const merged={...prev};
-  for(const k of Object.keys(raw))if(k in FIELDS&&raw[k]!=='')merged[k]=rec[k]; // blank cell = keep current value
-  return [prev,{...merged,notes:prev.notes,demo:false},'upd'];
- });
- const c={code:$('c-code').value.trim(),name:$('c-name').value.trim(),term:$('c-term').value.trim(),section:$('c-section').value.trim()};
- return plan.people.map(p=>{
-  const prev=byId.get(p.id);
-  const entry=c.code?{code:c.code,name:c.name,term:c.term,section:p.section||c.section}:null;
-  if(!prev)return [null,clean({id:p.id,name:p.name,contact:p.contact,year:guessYear(p.id),enroll:entry?[entry]:[]}),'new'];
-  const enroll=entry?[...prev.enroll.filter(e=>courseKey(e)!==courseKey(entry)),entry]:prev.enroll;
-  const changed=prev.name!==p.name||JSON.stringify(enroll)!==JSON.stringify(prev.enroll)||(!prev.contact&&p.contact);
-  return [prev,{...prev,name:p.name,contact:prev.contact||p.contact,enroll,demo:false},changed?'upd':'same'];
- });
-}
-let plan=null;
-const resultLabel={new:['ใหม่',''],upd:['อัปเดต','upd'],same:['ไม่เปลี่ยน','same']};
-function showPlan(){
- const pairs=buildPairs(plan),count=k=>pairs.filter(p=>p[2]===k).length;
- $('plan').hidden=false;
- $('courseFields').hidden=$('courseHint').hidden=plan.kind!=='reg';
- if(plan.kind==='reg')$('courseHint').textContent=plan.course.code?'ระบบอ่านข้อมูลรายวิชาจากไฟล์แล้ว ตรวจและแก้ได้ก่อนนำเข้า':'ไม่พบข้อมูลรายวิชาในไฟล์ กรอกรหัสวิชาเพื่อสร้างรายวิชา หรือเว้นว่างเพื่อนำเข้าเฉพาะรายชื่อ';
- const chip=(t,cls)=>node('span',t,'tag '+cls);
- $('planSummary').replaceChildren(chip('ใหม่ '+count('new')+' คน',''),chip('อัปเดต '+count('upd')+' คน','upd'),...(count('same')?[chip('ไม่เปลี่ยน '+count('same')+' คน','same')]:[]),...(plan.skipped?[chip('ข้าม '+plan.skipped+' แถว','same')]:[]));
- $('planRows').replaceChildren(...pairs.slice(0,500).map(([prev,next,res])=>{
-  const tr=node('tr'),[label,cls]=resultLabel[res],tag=node('td');
-  tag.append(chip(label,cls));
-  if(res==='upd'&&prev.name!==next.name)tag.append(node('small','เดิม: '+prev.name));
-  const sec=plan.kind==='reg'?(plan.people.find(p=>p.id===next.id)?.section||$('c-section').value||'—'):'—';
-  tr.append(node('td',next.id),node('td',next.name),node('td',sec),tag);
-  return tr;
- }));
- const n=pairs.filter(p=>p[2]!=='same').length;
- $('importGo').textContent=n?'นำเข้า '+n+' คน':'ไม่มีอะไรเปลี่ยน';
- $('importGo').disabled=!n;
-}
-function resetImport(){plan=null;$('importFile').value='';$('importErr').textContent='';$('plan').hidden=true;}
-$('importOpen').onclick=()=>{resetImport();$('importDlg').showModal();};
-$('importClose').onclick=$('importCancel').onclick=()=>$('importDlg').close();
-for(const id of ['c-code','c-name','c-term','c-section'])$(id).oninput=()=>plan&&showPlan();
-$('importFile').onchange=async event=>{
- const file=event.target.files[0];
- $('importErr').textContent='';$('plan').hidden=true;plan=null;
- if(!file)return;
- $('importErr').textContent='กำลังอ่านไฟล์…';
- try{
-  const {rows,text}=await readGrid(file);
-  if(!rows.length)throw new Error('ไฟล์นี้ไม่มีข้อมูล');
-  plan=planCSV(rows)??planRegistration(rows,text,file.name);
-  if(plan.kind==='reg')for(const k of ['code','name','term','section'])$('c-'+k).value=plan.course[k];
-  $('importErr').textContent='';
-  showPlan();
- }catch(e){$('importErr').textContent=e.message||'อ่านไฟล์ไม่ได้';}
-};
-$('importGo').onclick=async()=>{
- const pairs=buildPairs(plan).filter(p=>p[2]!=='same').map(([prev,next])=>[prev,next]);
- if(!pairs.length)return;
- $('importGo').disabled=true;$('importErr').textContent='กำลังนำเข้า…';
- try{
-  await store.many(pairs);
-  $('importDlg').close();toast('นำเข้าแล้ว '+pairs.length+' คน');
-  const code=$('c-code').value.trim();
-  if(plan.kind==='reg'&&code){renderCourseFilter();$('courseFilter').value=code+'|'+$('c-term').value.trim();render();}
- }catch(e){$('importErr').textContent=writeFailed(e);}
- finally{$('importGo').disabled=false;}
-};
-
-/* ---------- theme: lightbulb = light/dark, switch = follow the system ---------- */
-const root=document.documentElement, hostTheme=root.dataset.theme||'', darkQuery=matchMedia('(prefers-color-scheme: dark)');
-let theme='auto';
-try{const t=localStorage.getItem(THEME_KEY);if(['auto','light','dark'].includes(t))theme=t;}catch{}
-const effectiveTheme=()=>theme!=='auto'?theme:(hostTheme||(darkQuery.matches?'dark':'light'));
-function applyTheme(){
- if(theme==='auto'){if(hostTheme)root.dataset.theme=hostTheme;else delete root.dataset.theme;}
- else root.dataset.theme=theme;
- const light=effectiveTheme()==='light';
- $('bulb').setAttribute('aria-pressed',String(light));
- $('bulb').title=light?'โหมดสว่าง · กดเพื่อเปลี่ยนเป็นโหมดมืด':'โหมดมืด · กดเพื่อเปลี่ยนเป็นโหมดสว่าง';
- $('auto').setAttribute('aria-checked',String(theme==='auto'));
- $('auto').title=theme==='auto'?'ตามการตั้งค่าของเครื่อง':'กดเพื่อให้ตามการตั้งค่าของเครื่อง';
-}
-function saveTheme(){try{localStorage.setItem(THEME_KEY,theme);}catch{}applyTheme();}
-$('bulb').onclick=()=>{theme=effectiveTheme()==='light'?'dark':'light';saveTheme();};
-$('auto').onclick=()=>{theme=theme==='auto'?effectiveTheme():'auto';saveTheme();};
-darkQuery.addEventListener?.('change',applyTheme);
-applyTheme();
-
-/* ---------- Google Sheets mode ---------- */
-function showLogin(again){
- $('loginError').textContent='';$('l-pass').value='';$('l-new').value='';$('newWrap').hidden=true;
- $('loginSub').textContent=again?'กรุณาเข้าสู่ระบบอีกครั้ง':'กรุณาเข้าสู่ระบบ';
- if(!$('login').open)$('login').showModal();
-}
-async function signedIn(r){
- store.session={token:r.token,name:r.name,role:r.role};
- try{localStorage.setItem(SESSION_KEY,JSON.stringify(store.session));}catch{}
- $('login').close();updateWho();toast('ยินดีต้อนรับ '+r.name);
- await loadSheets();
-}
-let lastCredential='';
-$('registerForm').onsubmit=async e=>{
- e.preventDefault();
- $('registerBtn').disabled=true;$('loginError').textContent='กำลังตรวจสอบ…';
- try{await signedIn(await api('googleLogin',{credential:lastCredential,studentId:$('r-id').value.trim(),fullName:$('r-name').value.trim()}));$('registerForm').hidden=true;}
- catch(err){$('loginError').textContent=err.code==='auth_failed'?'หมดเวลา โปรดกดปุ่ม Google อีกครั้ง':err.message;}
- finally{$('registerBtn').disabled=false;}
-};
-function setupGoogle(){
- const usePw=()=>{$('loginForm').hidden=false;$('usePassword').hidden=true;};
- $('usePassword').onclick=usePw;
- if(!GOOGLE_CLIENT_ID){usePw();return;}
- $('loginForm').hidden=true;$('usePassword').hidden=false;$('gbtn').hidden=false;
- const script=document.createElement('script');
- script.src='https://accounts.google.com/gsi/client';script.async=true;
- script.onerror=()=>{$('loginError').textContent='โหลดปุ่ม Google ไม่ได้ ใช้ชื่อผู้ใช้และรหัสผ่านแทนได้';usePw();};
- script.onload=()=>{
-  google.accounts.id.initialize({client_id:GOOGLE_CLIENT_ID,auto_select:true,callback:async({credential})=>{
-   lastCredential=credential;$('registerForm').hidden=true;
-   $('loginError').textContent='กำลังตรวจสอบบัญชี…';
-   try{await signedIn(await api('googleLogin',{credential}));}
-   catch(err){
-    if(err.code==='need_register'){$('registerForm').hidden=false;$('r-id').focus();}
-    $('loginError').textContent=err.message;
-   }
-  }});
-  google.accounts.id.renderButton($('gbtn'),{theme:'outline',size:'large',shape:'pill',text:'signin_with',locale:'th'});
- };
- document.head.append(script);
-}
-function updateWho(){
- const s=store.session;
- $('whoBox').hidden=false;
- $('whoBox').classList.toggle('off',!s);
- $('who').textContent=s?'เข้าสู่ระบบ: '+s.name:'ยังไม่ได้เข้าสู่ระบบ';
- $('logout').hidden=$('refresh').hidden=!s;
- $('loginOpen').hidden=!!s;
- $('settingsOpen').hidden=!s||s.role!=='teacher';
-}
-$('loginOpen').onclick=()=>showLogin(false);
-$('settingsOpen').onclick=async()=>{
- $('settingsErr').textContent='กำลังโหลด…';$('settingsSave').disabled=true;$('settingsDlg').showModal();
- try{
-  const {settings:st}=await api('getSettings');
-  $('s-teachers').value=st.teacherEmails.join('\n');$('s-domains').value=st.studentDomains.join('\n');
-  $('s-maxmb').value=st.maxFileMB;$('s-selfreg').checked=st.allowSelfRegister;
-  $('settingsErr').textContent='';$('settingsSave').disabled=false;
- }catch(e){$('settingsErr').textContent=e.code==='auth'?'หมดเวลาเข้าสู่ระบบ โปรดเข้าสู่ระบบอีกครั้ง':e.message;}
-};
-$('settingsClose').onclick=$('settingsCancel').onclick=()=>$('settingsDlg').close();
-$('settingsForm').onsubmit=async e=>{
- e.preventDefault();
- $('settingsSave').disabled=true;$('settingsErr').textContent='กำลังบันทึก…';
- try{
-  await api('saveSettings',{settings:{teacherEmails:$('s-teachers').value,studentDomains:$('s-domains').value,maxFileMB:$('s-maxmb').value,allowSelfRegister:$('s-selfreg').checked}});
-  $('settingsDlg').close();toast('บันทึกการตั้งค่าแล้ว');
- }catch(err){$('settingsErr').textContent=err.message;}
- finally{$('settingsSave').disabled=false;}
-};
-async function loadStudentHome(){
- $('teacherMain').hidden=true;$('studentMain').hidden=false;
- $('studentMain').replaceChildren(node('p','กำลังโหลด…','muted'));
- try{
-  const {student:st}=await api('studentHome');
-  const wrap=node('div',undefined,'student-home');
-  const head=node('div');head.append(node('h1','สวัสดี '+st.name),node('p','รหัสนักศึกษา '+st.id+(st.year?' · ชั้นปี '+st.year:'')+(st.term?' · เทอม '+st.term:''),'muted'));
-  const courses=node('section',undefined,'panel');courses.append(node('h2','รายวิชาที่ลงทะเบียน'));
-  if(!st.enroll.length)courses.append(node('p','ยังไม่มีรายวิชา','muted'));
-  for(const e of st.enroll)courses.append(node('p',e.code+' '+e.name+(e.term?' · ภาคเรียน '+e.term:'')+(e.section?' · หมู่ '+e.section:'')));
-  const soon=node('section',undefined,'panel');soon.append(node('h2','กำลังจะเปิดให้ใช้'),node('p','ส่งงาน · เช็คชื่อด้วย QR · ใบลา · ดูคะแนน','muted'));
-  wrap.append(head,courses,soon);
-  $('studentMain').replaceChildren(wrap);
- }catch(e){
-  if(e.code==='auth'){store.session=null;updateWho();showLogin(true);return;}
-  $('studentMain').replaceChildren(node('p',e.message,'error'));
- }
-}
-async function loadSheets(){
- if(store.session?.role==='student')return loadStudentHome();
- $('teacherMain').hidden=false;$('studentMain').hidden=true;
- loading=true;loadProblem='';render();
- try{fromServer(await api('bootstrap'));}
- catch(e){
-  loading=false;
-  if(e.code==='auth'){store.session=null;updateWho();showLogin(true);}
-  else loadProblem='โหลดข้อมูลไม่สำเร็จ: '+e.message;
-  render();
- }
-}
-$('login').oncancel=e=>e.preventDefault();
-$('loginForm').onsubmit=async e=>{
- e.preventDefault();
- const newPassword=$('newWrap').hidden?undefined:$('l-new').value;
- if(newPassword!==undefined&&newPassword.length<8){$('loginError').textContent='รหัสผ่านใหม่ต้องยาวอย่างน้อย 8 ตัวอักษร';return;}
- $('loginBtn').disabled=true;$('loginError').textContent='';
- try{
-  const r=await api('login',{username:$('l-user').value.trim(),password:$('l-pass').value,newPassword});
-  await signedIn(r);
- }catch(err){
-  if(err.code==='must_change'){$('newWrap').hidden=false;$('l-new').required=true;$('l-new').focus();}
-  $('loginError').textContent=err.message;
- }finally{$('loginBtn').disabled=false;}
-};
-$('logout').onclick=async()=>{
- const token=store.session?.token;
- store.session=null;records=[];updateWho();render();
- $('teacherMain').hidden=false;$('studentMain').hidden=true;
- try{localStorage.removeItem(SESSION_KEY);}catch{}
- if(token)api('logout',{token}).catch(()=>{});
- try{google.accounts.id.disableAutoSelect();}catch{}
- showLogin();
-};
-$('refresh').onclick=()=>loadSheets();
-
-/* ---------- boot ---------- */
-render();
-if(!inViewer)$('guideLink').hidden=false;
-if(demoMode){$('demoBar').hidden=false;$('mode').textContent='โหมดทดลอง';}
-if(useSheets){
- setupGoogle();
- store.mode='sheets';
- $('mode').textContent='ข้อมูลเก็บใน Google Sheets';
- try{store.session=JSON.parse(localStorage.getItem(SESSION_KEY));}catch{}
- if(!store.session?.token)store.session=null;
- updateWho();
- if(store.session)loadSheets();else{loading=false;render();showLogin(false);}
-}
-if(inViewer)(async()=>{
- const [db,user]=await Promise.all([claude.use('db'),claude.use('user')]);
- if(!db){ // no shared store in this view: fall back to this browser
-  loading=false;records=local.load();
-  $('mode').textContent='ข้อมูลบันทึกในเบราว์เซอร์นี้';render();return;
- }
- store.mode='db';store.db=db;store.user=user;
- $('mode').textContent='ข้อมูลใช้ร่วมกันกับทุกคนที่เข้าถึงหน้านี้';
- if(user){
-  try{store.me=await user.id();}catch{}
-  try{const me=await user.me();if(me?.name){$('who').textContent=me.name;$('whoBox').hidden=false;}}catch{}
-  try{if(await user.can('data.write')===false)store.canWrite=false;}catch{}
- }
- const slow=setTimeout(()=>{if(loading){loading=false;loadProblem='ยังเชื่อมต่อฐานข้อมูลไม่ได้ ข้อมูลจะแสดงเมื่อเชื่อมต่อสำเร็จ';render();}},10000);
- db.collection('students').onSnapshot(snap=>{
-  records=snap.docs.map(d=>({...clean(d.data()),_doc:d.id})).filter(r=>r.id&&r.name);
-  if(!snap.metadata.fromCache){clearTimeout(slow);loadProblem='';}
-  loading=false;
-  if(editing?._doc){editing=records.find(r=>r._doc===editing._doc)??editing;}
-  render();
- },err=>{
-  clearTimeout(slow);loading=false;
-  loadProblem=err?.code==='revoked'?'สิทธิ์เข้าถึงข้อมูลเปลี่ยนไป โปรดเปิดหน้านี้ใหม่':'โหลดข้อมูลไม่สำเร็จ โปรดเปิดหน้านี้ใหม่อีกครั้ง';
-  render();
- });
-})();
+}catch{}
 </script>
 </body></html>

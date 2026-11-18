@@ -1,0 +1,133 @@
+<title>ลูกเทพศิลปศึกษา</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anuphan:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@400;500;600&display=swap">
+<style>
+/* Layout: brand header, short intro, two login cards (teacher / student), quick how-to, footer links. */
+:root{
+ --bg:#f5f4fa;--head:#eeecf7;--panel:#ffffff;--panel-2:#f3f1fa;--line:#e2dfee;--ink:#1c1a2e;--muted:#5f5c78;
+ --accent:#6a55d6;--accent-ink:#ffffff;--soft:#ece8ff;--soft-ink:#43319f;--ok:#137353;--ok-bg:#dcf4e9;--warn:#8f520c;--warn-bg:#fcecd5;
+ --font:'IBM Plex Sans Thai',system-ui,-apple-system,'Segoe UI',sans-serif;
+ --display:'Anuphan','IBM Plex Sans Thai',system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+ --bg:#10111a;--head:#151621;--panel:#191a27;--panel-2:#1e1f2e;--line:#2d2e40;--ink:#f6f4ff;--muted:#a3a6bd;
+ --accent:#b4a5ff;--accent-ink:#181328;--soft:#252139;--soft-ink:#ddd4ff;--ok:#a6eed1;--ok-bg:#233b37;--warn:#ffcf97;--warn-bg:#413427;color-scheme:dark}}
+:root[data-theme="dark"]{
+ --bg:#10111a;--head:#151621;--panel:#191a27;--panel-2:#1e1f2e;--line:#2d2e40;--ink:#f6f4ff;--muted:#a3a6bd;
+ --accent:#b4a5ff;--accent-ink:#181328;--soft:#252139;--soft-ink:#ddd4ff;--ok:#a6eed1;--ok-bg:#233b37;--warn:#ffcf97;--warn-bg:#413427;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.7 var(--font)}
+.wrap{max-width:1040px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header{background:var(--head);border-bottom:1px solid var(--line)}
+header .wrap{display:flex;align-items:center;gap:12px;min-height:74px;padding-block:10px}
+.logo{display:grid;place-items:center;width:42px;height:42px;border-radius:12px;background:var(--soft);color:var(--soft-ink);font:700 21px var(--display)}
+.brand{font:700 17px/1.4 var(--display)}
+.muted{color:var(--muted)}
+header .guide{margin-left:auto}
+h1,h2,h3{font-family:var(--display);margin:0;line-height:1.35;text-wrap:balance}
+h1{font-size:clamp(28px,4.6vw,40px);letter-spacing:-.02em}
+h2{font-size:22px}
+h3{font-size:16px}
+p,ul,ol{margin:0}
+a{color:var(--accent)}
+main{padding-block:44px 64px;display:grid;gap:36px}
+.intro{display:grid;gap:10px;max-width:68ch}
+.session{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:var(--ok-bg);color:var(--ok);border-radius:12px;padding:10px 16px;font-weight:500}
+.portals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.portal{display:grid;gap:14px;align-content:start;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px}
+.portal .who{display:flex;align-items:center;gap:12px}
+.badge{display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:var(--soft);color:var(--soft-ink);flex:none}
+.portal ul{padding-left:20px;display:grid;gap:4px}
+.portal .actions{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.btn{display:inline-block;text-decoration:none;font-weight:600;border-radius:10px;padding:11px 18px;background:var(--accent);color:var(--accent-ink)}
+.btn:focus-visible,a:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.copy{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.copy code{background:var(--panel-2);padding:3px 8px;border-radius:6px;color:var(--ink);overflow-wrap:anywhere}
+.copy button{font:inherit;font-size:13px;border:1px solid var(--line);background:var(--panel);color:var(--ink);border-radius:8px;padding:3px 9px;cursor:pointer}
+.howto{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.howto section{display:grid;gap:10px;align-content:start}
+.howto ol{padding-left:22px;display:grid;gap:6px}
+.note{background:var(--panel-2);border-radius:12px;padding:14px 18px;display:grid;gap:4px}
+footer{display:flex;gap:18px;flex-wrap:wrap;color:var(--muted);font-size:14px;border-top:1px solid var(--line);padding-top:18px}
+@media(max-width:720px){.portals,.howto{grid-template-columns:1fr}}
+</style>
+<header><div class="wrap"><div class="logo" aria-hidden="true">ศ</div><div><div class="brand">ลูกเทพศิลปศึกษา</div><div class="muted">สาขาศิลปศึกษา มหาวิทยาลัยราชภัฏเชียงใหม่</div></div><a class="guide" href="guide.html">คู่มือการใช้งาน</a></div></header>
+<main class="wrap">
+<section class="intro">
+ <h1>ระบบติดตามนักศึกษา สาขาศิลปศึกษา</h1>
+ <p class="muted">อาจารย์ใช้ติดตามผลการเรียน การเข้าเรียน ภาษาอังกฤษ การสังเกตการสอนและการทดลองสอนของนักศึกษาตลอด 4 ปี นักศึกษาเข้าดูรายวิชาของตัวเองได้ด้วยอีเมลมหาวิทยาลัย</p>
+</section>
+<div class="session" id="session" hidden></div>
+
+<section class="portals" aria-label="เลือกทางเข้าสู่ระบบ">
+ <article class="portal">
+  <div class="who"><span class="badge" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21V7l9-4 9 4v14"/><path d="M9 21v-6h6v6"/><path d="M8 10h8"/></svg></span><div><h2>สำหรับอาจารย์</h2><p class="muted">ผู้ดูแลและอาจารย์ประจำวิชา</p></div></div>
+  <ul>
+   <li>ดูภาพรวมและนักศึกษาที่ถึงกำหนดติดตาม</li>
+   <li>นำเข้ารายชื่อจากระบบทะเบียน (.xls) ระบบสร้างรายวิชาให้เอง</li>
+   <li>บันทึกเกรด ภาษาอังกฤษ สังเกตการสอน ทดลองสอน และประวัติการพูดคุย</li>
+   <li>ตั้งค่าการเข้าถึงของอาจารย์และนักศึกษา</li>
+  </ul>
+  <div class="actions"><a class="btn" href="teacher.html">เข้าสู่ระบบอาจารย์</a><a href="guide.html#teacher">คู่มืออาจารย์</a><a href="teacher.html?demo=1">ลองโหมดทดลอง</a></div>
+  <div class="copy">ลิงก์: <code data-link="teacher.html"></code><button type="button" data-copy="teacher.html">คัดลอก</button></div>
+ </article>
+ <article class="portal">
+  <div class="who"><span class="badge" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/><path d="M22 9v6"/></svg></span><div><h2>สำหรับนักศึกษา</h2><p class="muted">ใช้อีเมลมหาวิทยาลัยเข้าสู่ระบบ</p></div></div>
+  <ul>
+   <li>ดูข้อมูลและรายวิชาที่ลงทะเบียนของตัวเอง</li>
+   <li>กำลังจะเปิดให้ใช้: ส่งงาน เช็คชื่อด้วย QR ใบลา และดูคะแนน</li>
+  </ul>
+  <div class="actions"><a class="btn" href="student.html">เข้าสู่ระบบนักศึกษา</a><a href="guide.html#student">คู่มือนักศึกษา</a></div>
+  <div class="copy">ลิงก์สำหรับส่งให้นักศึกษา: <code data-link="student.html"></code><button type="button" data-copy="student.html">คัดลอก</button></div>
+ </article>
+</section>
+
+<section class="howto" aria-label="วิธีใช้งานโดยย่อ">
+ <section>
+  <h3>อาจารย์: เริ่มต้นใช้งาน</h3>
+  <ol>
+   <li>เข้าสู่ระบบด้วย Google ที่ <a href="teacher.html">หน้าอาจารย์</a></li>
+   <li>กด <b>ตั้งค่า</b> ใส่อีเมลอาจารย์ท่านอื่น และโดเมนอีเมลนักศึกษา เช่น <code>g.cmru.ac.th</code></li>
+   <li>กด <b>นำเข้าข้อมูล</b> แล้วเลือกไฟล์รายชื่อนักศึกษาลงทะเบียนจากระบบทะเบียน</li>
+   <li>ส่งลิงก์หน้านักศึกษาให้นักศึกษาในรายวิชา</li>
+   <li>กด <b>เปิดประวัติ</b> ที่แถวนักศึกษาเพื่อบันทึกข้อมูลและการติดตาม</li>
+  </ol>
+ </section>
+ <section>
+  <h3>นักศึกษา: เข้าสู่ระบบครั้งแรก</h3>
+  <ol>
+   <li>เปิด <a href="student.html">หน้านักศึกษา</a></li>
+   <li>กด <b>ลงชื่อเข้าใช้ด้วย Google</b> แล้วเลือกอีเมลมหาวิทยาลัย</li>
+   <li>ระบบจับคู่รหัสนักศึกษากับรายชื่อให้เอง ถ้าระบบให้กรอกรหัสและชื่อ ให้กรอกตรงกับทะเบียน</li>
+   <li>เข้าไม่ได้ ให้แจ้งอาจารย์ประจำวิชาให้นำเข้ารายชื่อก่อน</li>
+  </ol>
+ </section>
+</section>
+
+<div class="note">
+ <h3>ข้อมูลส่วนบุคคล</h3>
+ <p class="muted">ข้อมูลนักศึกษาเก็บใน Google Sheets ของสาขาเท่านั้น ไม่ได้อยู่ในหน้าเว็บหรือใน GitHub ทุกการเปิดดูต้องเข้าสู่ระบบ และนักศึกษาเห็นเฉพาะข้อมูลของตัวเอง</p>
+</div>
+
+<footer><a href="guide.html">คู่มือการใช้งาน</a><a href="teacher.html?demo=1">โหมดทดลอง</a><span>มหาวิทยาลัยราชภัฏเชียงใหม่</span></footer>
+</main>
+<script>
+const base=location.href.replace(/[#?].*$/,'').replace(/[^/]*$/,'');
+for(const el of document.querySelectorAll('[data-link]'))el.textContent=base+el.dataset.link;
+for(const btn of document.querySelectorAll('[data-copy]'))btn.onclick=async()=>{
+ const text=base+btn.dataset.copy;
+ try{await navigator.clipboard.writeText(text);btn.textContent='คัดลอกแล้ว';}
+ catch{const code=btn.previousElementSibling,r=document.createRange();r.selectNodeContents(code);const s=getSelection();s.removeAllRanges();s.addRange(r);btn.textContent='กด Ctrl+C';}
+ setTimeout(()=>btn.textContent='คัดลอก',2000);
+};
+try{
+ const t=localStorage.getItem('lukthep-theme');if(t==='light'||t==='dark')document.documentElement.dataset.theme=t;
+ const s=JSON.parse(localStorage.getItem('lukthep-session'));
+ if(s&&s.token&&s.name){
+  const box=document.getElementById('session'),a=document.createElement('a');
+  box.textContent='คุณเข้าสู่ระบบอยู่ในชื่อ '+s.name+' · ';
+  a.href=s.role==='student'?'student.html':'teacher.html';a.textContent='ไปที่ระบบ →';a.style.color='inherit';
+  box.append(a);box.hidden=false;
+ }
+}catch{}
+</script>
